@@ -18,7 +18,6 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
 <section class="card"><h2 class="section-title">📃 Cola musical</h2><button id="clearQueue" class="secondary" style="margin-bottom:10px">Borrar lista musical</button><div id="queue" class="queue"><div class="item"><small>Esperando peticiones musicales…</small></div></div></section>
 <section class="card"><h2 class="section-title">💬 Mensajes del LIVE</h2><label class="toggle"><input id="readMessages" type="checkbox" checked> Leer los mensajes en voz alta</label><label class="toggle"><input id="readNames" type="checkbox" checked> Leer también el nombre del usuario</label><label class="small" for="voiceSelect">Voz disponible en el iPhone</label><select id="voiceSelect" style="width:100%;padding:10px;border-radius:10px;background:#100c16;color:#fff;border:1px solid #53336b"></select><label class="small" for="speed">Velocidad de voz</label><input id="speed" type="range" min="0.6" max="1.8" step="0.1" value="1"><label class="small" for="speechVolume">Volumen de voz</label><input id="speechVolume" type="range" min="0" max="1" step="0.05" value="1"><button id="testVoice" class="secondary" style="margin-top:8px">Probar voz</button><div class="queue" id="messages" style="margin-top:12px"><div class="item"><small>Los comentarios aparecerán cuando Valentina esté conectada.</small></div></div><button id="clearMessages" class="secondary" style="margin-top:10px">Limpiar mensajes de esta pantalla</button></section>
 <div class="footer">Valentina Music Bridge · conexión en tiempo real</div></main>
-<script src="https://www.youtube.com/iframe_api"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
@@ -50,7 +49,7 @@ function runSpeechQueue(){
 function activateAudio(){
   audioUnlocked=true;
   if("speechSynthesis"in window){
-    try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance("Audio activado");u.lang="es-ES";u.volume=0.01;u.onend=()=>{speechBusy=false;runSpeechQueue()};speechSynthesis.speak(u)}catch(e){}
+    try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance("Audio activado");u.lang="es-ES";u.volume=1;u.rate=1;u.onend=()=>{speechBusy=false;runSpeechQueue()};u.onerror=()=>{speechBusy=false;runSpeechQueue()};speechSynthesis.speak(u)}catch(e){}
   }
   if(pendingVideo&&ytReady&&yt){try{audioUnlocked=true;yt.setVolume(Number($("volume").value));yt.loadVideoById(pendingVideo);if($("autoPlay").checked)yt.playVideo()}catch(e){}}
   $("playerNote").textContent="Audio activado. Cuando llegue una canción, pulsa Reproducir si no empieza automáticamente.";
@@ -114,6 +113,11 @@ window.onYouTubeIframeAPIReady=()=>{
     }})
   }catch(e){console.error(e);$("playerNote").textContent="No se pudo cargar el reproductor de YouTube."}
 };
+// Register the callback before loading YouTube API, avoiding the mobile race condition.
+const ytApiScript=document.createElement("script");
+ytApiScript.src="https://www.youtube.com/iframe_api";
+ytApiScript.async=true;
+document.head.appendChild(ytApiScript);
 function nextTrack(){
   const next=queueItems.find(x=>x.videoId&&!playedIds.has(x._id));
   if(!next){status("Conectada · esperando canciones");return}
@@ -128,8 +132,23 @@ $("playBtn").addEventListener("click",()=>{
 });
 $("nextBtn").addEventListener("click",nextTrack);
 $("volume").addEventListener("input",()=>{if(ytReady&&yt)yt.setVolume(Number($("volume").value))});
+$("enableAudioBtn").addEventListener("click",activateAudio);
+$("stopVoiceBtn").addEventListener("click",()=>{speechQueue.length=0;speechBusy=false;if("speechSynthesis" in window)speechSynthesis.cancel();});
+$("clearQueue").addEventListener("click",async()=>{
+  const button=$("clearQueue");button.disabled=true;button.textContent="Borrando…";
+  try{
+    await remove(ref(db,`rooms/${room}/queue`));
+    await remove(ref(db,`rooms/${room}/nowPlaying`));
+    queueItems=[];playedIds.clear();currentId="";pendingVideo="";
+    if(ytReady&&yt){try{yt.stopVideo();}catch(e){}}
+    $("nowPlaying").replaceChildren();const a=document.createElement("strong");a.textContent="Nada reproduciéndose";const b=document.createElement("small");b.textContent="La lista musical está vacía.";$("nowPlaying").append(a,b);
+    $("queue").replaceChildren();const empty=document.createElement("div");empty.className="item";empty.textContent="No hay canciones pendientes.";$("queue").append(empty);
+    $("playBtn").disabled=true;$("nextBtn").disabled=true;$("playerNote").textContent="Lista musical borrada.";status("Lista musical borrada","ok");
+  }catch(e){console.error(e);status("No se pudo borrar la lista. Revisa permisos de Firebase.","err");$("playerNote").textContent="Error al borrar: revisa las reglas de Firebase."}
+  finally{button.disabled=false;button.textContent="Borrar lista musical"}
+});
 function clearListeners(){unsubs.forEach(fn=>fn());unsubs=[]}
-function attach(){clearListeners();unsubs.push(onValue(ref(db,`rooms/${room}/pc/status`),snap=>{const s=snap.val();if(s?.online&&Date.now()-(s.lastSeen||0)<60000)status("Conectada · Valentina está en línea","ok");else status("Conectada · esperando a Valentina…")},()=>status("Error de permisos de Firebase","err")));unsubs.push(onValue(query(ref(db,`rooms/${room}/queue`),limitToLast(30)),snap=>{renderQueue(snap.val());resolveQueueRequests(snap.val());const next=queueItems.find(x=>x.videoId&&!playedIds.has(x._id));if(next&&next._id!==currentId)loadTrack(next,false)},()=>status("Error leyendo la cola · revisa permisos de Firebase","err")));unsubs.push(onValue(query(ref(db,`rooms/${room}/messages`),limitToLast(35)),snap=>{const data=snap.val();renderList("messages",data,"Esperando mensajes del LIVE…");const entries=data&&typeof data==="object"?Object.entries(data).sort((a,b)=>(a[1]?.createdAt||0)-(b[1]?.createdAt||0)):[];for(const [id,item] of entries){if(item&&item.createdAt>Date.now()-5000&&!window.__spokenIds?.has(id)){window.__spokenIds=window.__spokenIds||new Set();window.__spokenIds.add(id);speak(item)}}},()=>status("Error leyendo mensajes · revisa permisos de Firebase","err")));unsubs.push(onValue(ref(db,`rooms/${room}/nowPlaying`),snap=>{const item=snap.val();if(item?.videoId&&item.videoId!==pendingVideo)loadTrack(item,$("autoPlay").checked)},()=>{}))}
+function attach(){clearListeners();unsubs.push(onValue(ref(db,`rooms/${room}/pc/status`),snap=>{const s=snap.val();if(s?.online&&Date.now()-(s.lastSeen||0)<60000)status("Conectada · Valentina está en línea","ok");else status("Conectada · esperando a Valentina…")},()=>status("Error de permisos de Firebase","err")));unsubs.push(onValue(query(ref(db,`rooms/${room}/queue`),limitToLast(30)),snap=>{renderQueue(snap.val());resolveQueueRequests(snap.val());const next=queueItems.find(x=>x.videoId&&!playedIds.has(x._id));if(next&&next._id!==currentId&&Date.now()-(next.createdAt||0)<120000)loadTrack(next,false)},()=>status("Error leyendo la cola · revisa permisos de Firebase","err")));unsubs.push(onValue(query(ref(db,`rooms/${room}/messages`),limitToLast(35)),snap=>{const data=snap.val();renderList("messages",data,"Esperando mensajes del LIVE…");const entries=data&&typeof data==="object"?Object.entries(data).sort((a,b)=>(a[1]?.createdAt||0)-(b[1]?.createdAt||0)):[];for(const [id,item] of entries){if(item&&item.createdAt>Date.now()-5000&&!window.__spokenIds?.has(id)){window.__spokenIds=window.__spokenIds||new Set();window.__spokenIds.add(id);speak(item)}}},()=>status("Error leyendo mensajes · revisa permisos de Firebase","err")));unsubs.push(onValue(ref(db,`rooms/${room}/nowPlaying`),snap=>{const item=snap.val();if(item?.videoId&&item.videoId!==pendingVideo)loadTrack(item,$("autoPlay").checked)},()=>{}))}
 $("connectBtn").addEventListener("click",async()=>{$("connectBtn").disabled=true;status("Conectando…");try{if(!auth.currentUser)await signInAnonymously(auth);connected=true;$("connectBtn").textContent="✓ Conectada";$("helpText").textContent="La página ya está escuchando los mensajes y la cola. Deja esta pestaña abierta; iOS puede suspenderla en segundo plano.";attach()}catch(e){console.error(e);status("No se pudo conectar. Revisa Authentication y las reglas de Firebase.","err");$("helpText").textContent="Firebase rechazó el acceso. No abras reglas al público; comprueba el inicio anónimo y las reglas autenticadas.";$("connectBtn").textContent="Reintentar conexión"}finally{$("connectBtn").disabled=false}});
 onAuthStateChanged(auth,user=>{if(user&&connected)attach()});
 $("clearMessages").addEventListener("click",()=>{$("messages").replaceChildren();const e=document.createElement("div");e.className="item";e.textContent="Mensajes ocultos en esta pantalla; no se borraron de Firebase."; $("messages").append(e)});
