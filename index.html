@@ -129,8 +129,8 @@ function loadTrack(item,auto=false){
 window.onYouTubeIframeAPIReady=()=>{
   try{
     yt=new YT.Player("ytPlayer",{height:"100%",width:"100%",videoId:"",playerVars:{autoplay:0,controls:1,playsinline:1,rel:0,fs:1,enablejsapi:1},events:{
-      onReady:()=>{ytReady=true;yt.setVolume(Number($("volume").value));$("playBtn").disabled=!pendingVideo;$("nextBtn").disabled=!queueItems.some(x=>x.videoId&&!playedIds.has(x._id));if(pendingVideo){try{if(audioUnlocked&&$("autoPlay").checked){yt.loadVideoById(pendingVideo);yt.playVideo()}else yt.cueVideoById(pendingVideo)}catch(e){}}},
-      onStateChange:e=>{if(e.data===0){restoreMusicAfterSpeech();if(audioUnlocked){const next=queueItems.find(x=>x.videoId&&!playedIds.has(x._id));if(next){nextTrack();if(ytReady&&yt&&pendingVideo){yt.loadVideoById(pendingVideo);yt.playVideo()}}else $("playerNote").textContent="La canción terminó. No hay más canciones en cola."}else $("playerNote").textContent="La canción terminó. Pulsa Siguiente para continuar."}},
+      onReady:()=>{ytReady=true;yt.setVolume(Number($("volume").value));$("playBtn").disabled=!pendingVideo;$("nextBtn").disabled=!queueItems.some(x=>x.videoId&&!playedIds.has(x._id));if(pendingVideo){try{if(audioUnlocked&&$("autoPlay").checked){yt.setVolume(Number($("volume").value));yt.loadVideoById(pendingVideo);yt.playVideo()}else yt.cueVideoById(pendingVideo)}catch(e){}}},
+      onStateChange:e=>{if(e.data===0){restoreMusicAfterSpeech();if(audioUnlocked){const next=queueItems.find(x=>!playedIds.has(x._id));if(next){nextTrack()}else $("playerNote").textContent="La canción terminó. No hay más canciones en cola."}else $("playerNote").textContent="La canción terminó. Pulsa Siguiente para continuar."}},
       onError:e=>{$("playerNote").textContent="YouTube no permite reproducir este resultado (código "+e.data+"). Pulsa Siguiente para probar otro."}
     }})
   }catch(e){console.error(e);$("playerNote").textContent="No se pudo cargar el reproductor de YouTube."}
@@ -140,23 +140,37 @@ const ytApiScript=document.createElement("script");
 ytApiScript.src="https://www.youtube.com/iframe_api";
 ytApiScript.async=true;
 document.head.appendChild(ytApiScript);
+let advancing=false;
 function nextTrack(){
-  // If a track is currently selected, mark it consumed before choosing the next one.
-  if(currentId)playedIds.add(currentId);
-  const next=queueItems.find(x=>x.videoId&&!playedIds.has(x._id));
-  if(!next){
-    pendingVideo="";currentId="";
-    if(ytReady&&yt){try{yt.stopVideo()}catch(e){}}
-    const a=document.createElement("strong");a.textContent="Nada reproduciéndose";const b=document.createElement("small");b.textContent="Esperando una canción nueva.";$("nowPlaying").replaceChildren(a,b);
-    $("playBtn").disabled=true;$("nextBtn").disabled=true;$("playerNote").textContent="No hay otra canción en cola.";return;
-  }
-  loadTrack(next,false);
-  if(audioUnlocked&&ytReady&&yt){try{yt.setVolume(Number($("volume").value));yt.loadVideoById(next.videoId);yt.playVideo();playedIds.add(next._id);$("playerNote").textContent="Reproduciendo siguiente canción."}catch(e){$("playerNote").textContent="Canción preparada. Pulsa Reproducir."}}
-  else $("playerNote").textContent="Siguiente canción preparada. Pulsa Reproducir para iniciar.";
+  if(advancing)return;
+  advancing=true;
+  try{
+    if(currentId)playedIds.add(currentId);
+    const next=queueItems.find(x=>!playedIds.has(x._id));
+    if(!next){
+      pendingVideo="";currentId="";
+      if(ytReady&&yt){try{yt.stopVideo()}catch(e){}}
+      const a=document.createElement("strong");a.textContent="Nada reproduciéndose";
+      const b=document.createElement("small");b.textContent="Esperando una canción nueva.";
+      $("nowPlaying").replaceChildren(a,b);$("playBtn").disabled=true;$("nextBtn").disabled=true;
+      $("playerNote").textContent="No hay otra canción en cola.";return;
+    }
+    if(!next.videoId){
+      currentId="";pendingVideo="";
+      $("playerNote").textContent="La siguiente petición se está buscando; se respetará el orden de llegada.";
+      $("playBtn").disabled=true;
+      return;
+    }
+    loadTrack(next,false);
+    if(audioUnlocked&&$("autoPlay").checked&&ytReady&&yt){
+      try{yt.setVolume(Number($("volume").value));yt.loadVideoById(next.videoId);yt.playVideo();playedIds.add(next._id);$("playerNote").textContent="Reproducción de la siguiente canción solicitada."}
+      catch(e){$("playerNote").textContent="Pulsa Reproducir para iniciar la siguiente canción."}
+    } else $("playerNote").textContent="Siguiente canción preparada. Pulsa Reproducir si el navegador lo exige.";
+  } finally {advancing=false}
 }
 function handleRemoteSkip(item){
   const at=Number(item?.createdAt)||0;
-  if(!skipListenerPrimed){skipListenerPrimed=true;lastSkipAt=at;return;}
+  if(!skipListenerPrimed){skipListenerPrimed=true;lastSkipAt=at;return}
   if(!at||at<=lastSkipAt)return;
   lastSkipAt=at;
   if(currentId)playedIds.add(currentId);
@@ -168,7 +182,12 @@ $("playBtn").addEventListener("click",()=>{
   try{audioUnlocked=true;const current=queueItems.find(x=>x.videoId===pendingVideo);if(current)playedIds.add(current._id);yt.setVolume(Number($("volume").value));yt.loadVideoById(pendingVideo);yt.playVideo();$("playerNote").textContent="Solicitando reproducción…"}catch(e){$("playerNote").textContent="No se pudo iniciar. Vuelve a pulsar Reproducir."}
 });
 $("nextBtn").addEventListener("click",nextTrack);
-$("volume").addEventListener("input",()=>{if(ytReady&&yt)yt.setVolume(Number($("volume").value))});
+function applyMusicVolume(){
+  const value=Math.max(0,Math.min(100,Number($("volume").value)||0));
+  if(ytReady&&yt){try{yt.setVolume(value);if(musicDucked)yt.setVolume(Math.round(value*0.28))}catch(e){console.warn("No se pudo ajustar el volumen",e)}}
+}
+$("volume").addEventListener("input",applyMusicVolume);
+$("volume").addEventListener("change",applyMusicVolume);
 $("enableAudioBtn").addEventListener("click",activateAudio);
 $("stopVoiceBtn").addEventListener("click",()=>{speechQueue.length=0;speechBusy=false;if("speechSynthesis" in window)speechSynthesis.cancel();restoreMusicAfterSpeech();});
 $("clearQueue").addEventListener("click",async()=>{
@@ -185,7 +204,18 @@ $("clearQueue").addEventListener("click",async()=>{
   finally{button.disabled=false;button.textContent="Borrar lista musical"}
 });
 function clearListeners(){unsubs.forEach(fn=>fn());unsubs=[]}
-function attach(){clearListeners();unsubs.push(onValue(ref(db,`rooms/${room}/pc/status`),snap=>{const s=snap.val();if(s?.online&&Date.now()-(s.lastSeen||0)<60000)status("Conectada · Valentina está en línea","ok");else status("Conectada · esperando a Valentina…")},()=>status("Error de permisos de Firebase","err")));unsubs.push(onValue(query(ref(db,`rooms/${room}/queue`),limitToLast(30)),snap=>{renderQueue(snap.val());resolveQueueRequests(snap.val());const next=queueItems.find(x=>x.videoId&&!playedIds.has(x._id));if(next&&next._id!==currentId&&Date.now()-(next.createdAt||0)<120000)loadTrack(next,false)},()=>status("Error leyendo la cola · revisa permisos de Firebase","err")));unsubs.push(onValue(ref(db,`rooms/${room}/control/skip`),snap=>handleRemoteSkip(snap.val()),()=>{}));let messagesSnapshotPrimed=false;
+function attach(){clearListeners();unsubs.push(onValue(ref(db,`rooms/${room}/pc/status`),snap=>{const s=snap.val();if(s?.online&&Date.now()-(s.lastSeen||0)<60000)status("Conectada · Valentina está en línea","ok");else status("Conectada · esperando a Valentina…")},()=>status("Error de permisos de Firebase","err")));unsubs.push(onValue(query(ref(db,`rooms/${room}/queue`),limitToLast(30)),snap=>{
+  renderQueue(snap.val());
+  resolveQueueRequests(snap.val());
+  // Strict FIFO: never play a later resolved request while the oldest request is still resolving.
+  const first=queueItems.find(x=>!playedIds.has(x._id));
+  if(first&&first.videoId&&first._id!==currentId){
+    loadTrack(first,false);
+    if(audioUnlocked&&$("autoPlay").checked&&ytReady&&yt){
+      try{yt.setVolume(Number($("volume").value));yt.loadVideoById(first.videoId);yt.playVideo();playedIds.add(first._id);$("playerNote").textContent="Reproducción automática solicitada."}catch(e){$("playerNote").textContent="Toca Reproducir para iniciar esta canción."}
+    }
+  }
+},()=>status("Error leyendo la cola · revisa permisos de Firebase","err")));unsubs.push(onValue(ref(db,`rooms/${room}/control/skip`),snap=>handleRemoteSkip(snap.val()),()=>{}));let messagesSnapshotPrimed=false;
 unsubs.push(onValue(query(ref(db,`rooms/${room}/messages`),limitToLast(35)),snap=>{
   const data=snap.val();
   renderList("messages",data,"Esperando mensajes del LIVE…");
