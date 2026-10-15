@@ -14,7 +14,7 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
 <body><main class="wrap">
 <header><div class="logo">♫</div><h1>VALENTINA MUSIC</h1><p>Música y mensajes sincronizados con Valentina</p></header>
 <section class="card"><div class="status"><span id="dot" class="dot"></span><span id="statusText">Desconectada</span></div><button id="connectBtn">⟷ Conectar con Valentina</button><p class="small" id="helpText">Abre esta página en el iPhone y pulsa Conectar. En el PC, abre el LIVE de TikTok y activa el conector Valentina Music Bridge.</p></section>
-<section class="card"><h2 class="section-title">🎵 Reproductor de audio</h2><div id="nowPlaying" class="item"><strong>Nada reproduciéndose</strong><small>Las canciones solicitadas por el chat aparecerán aquí.</small></div><div class="row"><button id="enableAudioBtn">🔊 Activar audio</button><button id="playBtn" disabled>▶ Reproducir</button></div><div class="row"><button id="nextBtn" class="secondary" disabled>⏭ Saltar canción (!skip)</button><button id="stopVoiceBtn" class="secondary">Detener voz</button></div><label class="toggle"><input id="autoPlay" type="checkbox" checked> Intentar reproducir automáticamente cuando sea posible</label><label class="small" for="volume">Volumen</label><input id="volume" type="range" min="0" max="100" value="75"><p id="playerNote" class="small">Usa !play canción o ¡play canción en el chat para pedir música, y !skip o ¡skip para saltar. Al conectar se limpia la cola antigua. La reproducción usa el reproductor oficial de YouTube visible para que los navegadores móviles permitan iniciar el audio. En Android, iPhone y ordenador, pulsa Reproducir si el navegador bloquea el inicio automático. La reproducción en segundo plano depende del navegador y del sistema.</p><div id="ytPlayerHost"><div id="ytPlayer"></div></div></section>
+<section class="card"><h2 class="section-title">🎵 Reproductor de audio</h2><div id="nowPlaying" class="item"><strong>Nada reproduciéndose</strong><small>Las canciones solicitadas por el chat aparecerán aquí.</small></div><div class="row"><button id="enableAudioBtn">🔊 Activar audio</button><button id="playBtn" disabled>▶ Reproducir</button></div><div class="row"><button id="nextBtn" class="secondary" disabled>⏭ Saltar canción (!skip)</button><button id="stopVoiceBtn" class="secondary">Detener voz</button></div><label class="toggle"><input id="autoPlay" type="checkbox" checked> Intentar reproducir automáticamente cuando sea posible</label><label class="small" for="volume">Volumen</label><input id="volume" type="range" min="0" max="100" value="75"><p id="playerNote" class="small">Usa !play canción o ¡play canción en el chat para pedir música, y !skip o ¡skip para saltar. Al conectar se limpia la cola antigua. La reproducción usa el reproductor oficial de YouTube visible para que los navegadores móviles permitan iniciar el audio. En móvil puede ser necesario pulsar Activar audio una vez; después la página intentará pasar a la siguiente canción sola. La reproducción en segundo plano depende del navegador y del sistema.</p><div id="ytPlayerHost"><div id="ytPlayer"></div></div></section>
 <section class="card"><h2 class="section-title">📃 Cola musical</h2><button id="clearQueue" class="secondary" style="margin-bottom:10px">Borrar lista musical</button><div id="queue" class="queue"><div class="item"><small>Esperando peticiones musicales…</small></div></div></section>
 <section class="card"><h2 class="section-title">💬 Mensajes del LIVE</h2><label class="toggle"><input id="readMessages" type="checkbox" checked> Leer los mensajes en voz alta</label><label class="toggle"><input id="readNames" type="checkbox" checked> Leer también el nombre del usuario</label><label class="small" for="voiceSelect">Voz disponible en el iPhone</label><select id="voiceSelect" style="width:100%;padding:10px;border-radius:10px;background:#100c16;color:#fff;border:1px solid #53336b"></select><label class="small" for="speed">Velocidad de voz</label><input id="speed" type="range" min="0.6" max="1.8" step="0.1" value="1"><label class="small" for="speechVolume">Volumen de voz</label><input id="speechVolume" type="range" min="0" max="1" step="0.05" value="1"><button id="testVoice" class="secondary" style="margin-top:8px">Probar voz</button><div class="queue" id="messages" style="margin-top:12px"><div class="item"><small>Los comentarios aparecerán cuando Valentina esté conectada.</small></div></div><button id="clearMessages" class="secondary" style="margin-top:10px">Limpiar mensajes de esta pantalla</button></section>
 <div class="footer">Valentina Music Bridge · conexión en tiempo real</div></main>
@@ -69,7 +69,7 @@ function activateAudio(){
   if("speechSynthesis"in window){
     try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance("Audio activado");u.lang="es-ES";u.volume=1;u.rate=1;u.onend=()=>{speechBusy=false;runSpeechQueue()};u.onerror=()=>{speechBusy=false;runSpeechQueue()};speechSynthesis.speak(u)}catch(e){}
   }
-  if(pendingVideo&&ytReady&&yt){try{audioUnlocked=true;yt.setVolume(Number($("volume").value));yt.loadVideoById(pendingVideo);if($("autoPlay").checked)yt.playVideo()}catch(e){}}
+  if(pendingVideo&&ytReady&&yt){try{if($("autoPlay").checked)startVideo(pendingVideo);else{yt.unMute();yt.setVolume(Number($("volume").value));yt.playVideo()}}catch(e){}}
   $("playerNote").textContent="Audio activado. Las canciones nuevas intentarán reproducirse automáticamente; el navegador puede exigir una interacción adicional.";
 }
 function renderList(id,value,empty){
@@ -103,9 +103,23 @@ async function resolveQueueRequests(data){
     finally{resolving.delete(id)}
   }
 }
+function startVideo(videoId){
+  if(!ytReady||!yt||!videoId)return false;
+  const value=Math.max(0,Math.min(100,Number($("volume").value)||0));
+  try{
+    yt.unMute();
+    yt.setVolume(value);
+    // loadVideoById starts playback itself; avoid a second playVideo call racing it.
+    yt.loadVideoById({videoId, startSeconds:0, suggestedQuality:"large"});
+    return true;
+  }catch(e){console.warn("No se pudo iniciar la canción",e);return false}
+}
 function loadTrack(item,auto=false){
   if(!item)return;
-  currentId=item._id||item.videoId||"";
+  const id=item._id||item.videoId||"";
+  // Never reload/cue the same track on every Firebase queue update.
+  if(id===currentId && item.videoId===pendingVideo)return;
+  currentId=id;
   pendingVideo=item.videoId||"";
   const strong=document.createElement("strong");strong.textContent=item.title||item.query||"Canción";
   const sm=document.createElement("small");sm.textContent=(item.artist||"")+" · preparado para reproducir";
@@ -114,23 +128,47 @@ function loadTrack(item,auto=false){
   $("nextBtn").disabled=!queueItems.some(x=>x.videoId&&!playedIds.has(x._id));
   if(ytReady&&yt&&pendingVideo){
     try{
-      yt.cueVideoById(pendingVideo);
-      yt.setVolume(Number($("volume").value));
-      $("playerNote").textContent="Canción preparada.";
-      if(audioUnlocked&&$("autoPlay").checked){
-        yt.setVolume(Number($("volume").value));
-        yt.loadVideoById(pendingVideo);
-        yt.playVideo();
-        $("playerNote").textContent="Reproducción automática solicitada.";
-      } else if(auto) {$("playerNote").textContent="Toca Activar audio una vez para permitir la reproducción automática."}
+      if(audioUnlocked&&$("autoPlay").checked&&auto){
+        if(startVideo(pendingVideo)){
+          playedIds.add(currentId);
+          $("playerNote").textContent="Reproducción automática solicitada.";
+        }
+      }else{
+        yt.cueVideoById(pendingVideo);
+        yt.setVolume(Math.max(0,Math.min(100,Number($("volume").value)||0)));
+        $("playerNote").textContent="Canción preparada.";
+        if(auto)$("playerNote").textContent="Pulsa Activar audio una vez; después intentará pasar las canciones automáticamente.";
+      }
     }catch(e){console.warn(e);$("playerNote").textContent="No se pudo preparar el vídeo. Prueba otra canción."}
   }
 }
 window.onYouTubeIframeAPIReady=()=>{
   try{
     yt=new YT.Player("ytPlayer",{height:"100%",width:"100%",videoId:"",playerVars:{autoplay:0,controls:1,playsinline:1,rel:0,fs:1,enablejsapi:1},events:{
-      onReady:()=>{ytReady=true;yt.setVolume(Number($("volume").value));$("playBtn").disabled=!pendingVideo;$("nextBtn").disabled=!queueItems.some(x=>x.videoId&&!playedIds.has(x._id));if(pendingVideo){try{if(audioUnlocked&&$("autoPlay").checked){yt.setVolume(Number($("volume").value));yt.loadVideoById(pendingVideo);yt.playVideo()}else yt.cueVideoById(pendingVideo)}catch(e){}}},
-      onStateChange:e=>{if(e.data===0){restoreMusicAfterSpeech();if(audioUnlocked){const next=queueItems.find(x=>!playedIds.has(x._id));if(next){nextTrack()}else $("playerNote").textContent="La canción terminó. No hay más canciones en cola."}else $("playerNote").textContent="La canción terminó. Pulsa Siguiente para continuar."}},
+      onReady:()=>{
+        ytReady=true;
+        yt.setVolume(Math.max(0,Math.min(100,Number($("volume").value)||0)));
+        $("playBtn").disabled=!pendingVideo;
+        $("nextBtn").disabled=!queueItems.some(x=>x.videoId&&!playedIds.has(x._id));
+        if(pendingVideo){
+          try{
+            if(audioUnlocked&&$("autoPlay").checked)startVideo(pendingVideo);
+            else yt.cueVideoById(pendingVideo);
+          }catch(e){}
+        }
+      },
+      onStateChange:e=>{
+        if(e.data===1){
+          // A track is considered consumed once YouTube actually starts it.
+          if(currentId)playedIds.add(currentId);
+          $("playBtn").disabled=false;
+        }
+        if(e.data===0){
+          restoreMusicAfterSpeech();
+          if(audioUnlocked&&$("autoPlay").checked)nextTrack();
+          else $("playerNote").textContent="La canción terminó. Pulsa Activar audio para continuar automáticamente.";
+        }
+      },
       onError:e=>{$("playerNote").textContent="YouTube no permite reproducir este resultado (código "+e.data+"). Pulsa Siguiente para probar otro."}
     }})
   }catch(e){console.error(e);$("playerNote").textContent="No se pudo cargar el reproductor de YouTube."}
@@ -146,26 +184,28 @@ function nextTrack(){
   advancing=true;
   try{
     if(currentId)playedIds.add(currentId);
-    const next=queueItems.find(x=>!playedIds.has(x._id));
+    const next=queueItems.find(x=>!playedIds.has(x._id)&&x.videoId);
     if(!next){
-      pendingVideo="";currentId="";
+      currentId="";pendingVideo="";
       if(ytReady&&yt){try{yt.stopVideo()}catch(e){}}
       const a=document.createElement("strong");a.textContent="Nada reproduciéndose";
       const b=document.createElement("small");b.textContent="Esperando una canción nueva.";
       $("nowPlaying").replaceChildren(a,b);$("playBtn").disabled=true;$("nextBtn").disabled=true;
-      $("playerNote").textContent="No hay otra canción en cola.";return;
-    }
-    if(!next.videoId){
-      currentId="";pendingVideo="";
-      $("playerNote").textContent="La siguiente petición se está buscando; se respetará el orden de llegada.";
-      $("playBtn").disabled=true;
+      $("playerNote").textContent=queueItems.some(x=>!playedIds.has(x._id))
+        ?"La siguiente petición aún se está buscando en YouTube; pasará automáticamente cuando esté lista."
+        :"No hay otra canción en cola.";
       return;
     }
     loadTrack(next,false);
     if(audioUnlocked&&$("autoPlay").checked&&ytReady&&yt){
-      try{yt.setVolume(Number($("volume").value));yt.loadVideoById(next.videoId);yt.playVideo();playedIds.add(next._id);$("playerNote").textContent="Reproducción de la siguiente canción solicitada."}
-      catch(e){$("playerNote").textContent="Pulsa Reproducir para iniciar la siguiente canción."}
-    } else $("playerNote").textContent="Siguiente canción preparada. Pulsa Reproducir si el navegador lo exige.";
+      if(startVideo(next.videoId)){
+        playedIds.add(next._id);
+        $("playerNote").textContent="Reproduciendo automáticamente la siguiente canción.";
+      }else $("playerNote").textContent="No se pudo iniciar automáticamente. Pulsa Reproducir.";
+    }else{
+      if(ytReady&&yt)yt.cueVideoById(next.videoId);
+      $("playerNote").textContent="Siguiente canción preparada. Activa el audio para continuar automáticamente.";
+    }
   } finally {advancing=false}
 }
 function handleRemoteSkip(item){
@@ -179,12 +219,26 @@ function handleRemoteSkip(item){
 }
 $("playBtn").addEventListener("click",()=>{
   if(!ytReady||!yt||!pendingVideo){$("playerNote").textContent="Todavía no hay una canción preparada.";return}
-  try{audioUnlocked=true;const current=queueItems.find(x=>x.videoId===pendingVideo);if(current)playedIds.add(current._id);yt.setVolume(Number($("volume").value));yt.loadVideoById(pendingVideo);yt.playVideo();$("playerNote").textContent="Solicitando reproducción…"}catch(e){$("playerNote").textContent="No se pudo iniciar. Vuelve a pulsar Reproducir."}
+  try{
+    audioUnlocked=true;
+    const current=queueItems.find(x=>x._id===currentId)||queueItems.find(x=>x.videoId===pendingVideo);
+    if(current)currentId=current._id;
+    if(startVideo(pendingVideo)){
+      if(current)playedIds.add(current._id);
+      $("playerNote").textContent="Reproduciendo. La siguiente canción intentará iniciar automáticamente.";
+    }else $("playerNote").textContent="No se pudo iniciar. Vuelve a pulsar Reproducir.";
+  }catch(e){$("playerNote").textContent="No se pudo iniciar. Vuelve a pulsar Reproducir."}
 });
 $("nextBtn").addEventListener("click",nextTrack);
 function applyMusicVolume(){
   const value=Math.max(0,Math.min(100,Number($("volume").value)||0));
-  if(ytReady&&yt){try{yt.setVolume(value);if(musicDucked)yt.setVolume(Math.round(value*0.28))}catch(e){console.warn("No se pudo ajustar el volumen",e)}}
+  if(ytReady&&yt){
+    try{
+      if(value>0)yt.unMute();
+      yt.setVolume(musicDucked?Math.round(value*0.28):value);
+      $("volume").setAttribute("aria-valuetext",value+" por ciento");
+    }catch(e){console.warn("No se pudo ajustar el volumen",e)}
+  }
 }
 $("volume").addEventListener("input",applyMusicVolume);
 $("volume").addEventListener("change",applyMusicVolume);
