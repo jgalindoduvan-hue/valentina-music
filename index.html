@@ -9,9 +9,35 @@
 .wrap{max-width:650px;margin:auto;padding:18px 14px calc(28px + env(safe-area-inset-bottom))}header{text-align:center;padding:18px 8px}.logo{width:68px;height:68px;border-radius:22px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--pink),var(--purple));box-shadow:0 0 32px #b700ff55;font-size:34px}h1{margin:0;font-size:clamp(26px,7vw,35px);letter-spacing:.04em}header p{margin:8px 0 0;color:var(--muted)}
 .card{background:#17111fef;border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 12px 35px #0004}.status{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:14px;margin-bottom:12px}.dot{width:10px;height:10px;border-radius:50%;background:#8d8298;flex:none}.dot.ok{background:var(--good);box-shadow:0 0 12px #69f0ae88}.dot.err{background:var(--bad)}
 button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px 15px;font-weight:750;cursor:pointer;color:#fff;background:linear-gradient(100deg,var(--pink),var(--purple));width:100%;min-height:46px}button:disabled{opacity:.5}.secondary{background:#2b1c38;border:1px solid #53336b}.small{font-size:12px;color:var(--muted);line-height:1.5}.section-title{font-size:17px;margin:0 0 12px}.queue{display:grid;gap:8px}.item{padding:11px;border:1px solid #382044;border-radius:12px;background:#100c16;overflow-wrap:anywhere}.item strong{display:block}.item small{display:block;color:var(--muted);margin-top:3px}.hidden{display:none!important}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.toggle{display:flex;gap:10px;align-items:center;margin:10px 0;color:#e9dff1;font-size:14px}.toggle input{width:20px;height:20px;accent-color:#d53cff}input[type=range]{width:100%;accent-color:#ff39d2}audio{width:100%;margin-top:10px}.footer{text-align:center;color:#81748e;font-size:12px;padding:12px}#ytPlayerHost{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:12px;background:#000;margin-top:12px}#ytPlayer,#ytPlayerHost iframe{width:100%!important;height:100%!important;display:block;min-height:220px}
+
+/* Menú flotante de widgets */
+.widget-menu{position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:9999;font-size:14px}
+.widget-menu-toggle{width:auto;min-height:40px;padding:9px 13px;border:1px solid #ff39d288;border-radius:13px;background:#17111ff2;box-shadow:0 0 18px #b700ff35;backdrop-filter:blur(12px)}
+.widget-menu-dropdown{display:none;position:absolute;right:0;top:47px;width: min(440px, calc(100vw - 24px));border:1px solid #6a3582;border-radius:16px;background:#130d1cf7;box-shadow:0 16px 48px #0009;padding:10px;}
+.widget-menu-dropdown.open{display:block}
+.widget-menu-option{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:11px 12px;min-height:42px;background:#281636;border:1px solid #633778;border-radius:11px}
+.widget-panel{display:none;margin-top:10px;border:1px solid #472457;border-radius:12px;overflow:hidden;background:#09070d}
+.widget-panel.open{display:block}
+.widget-panel-title{padding:9px 10px;color:#f5dfff;font-weight:750;display:flex;align-items:center;justify-content:space-between}
+.widget-panel iframe{display:block;width:100%;height:310px;border:0;background:#09070d}
+.widget-hint{font-size:11px;color:#b8a9c8;padding:0 10px 9px;line-height:1.4}
+@media(max-width:480px){.widget-menu{top:max(8px,env(safe-area-inset-top));right:8px}.widget-menu-toggle{min-height:38px;padding:8px 10px}.widget-panel iframe{height:280px}}
+
 </style>
 </head>
-<body><main class="wrap">
+<body>
+<div class="widget-menu" id="widgetMenu">
+  <button class="widget-menu-toggle" id="widgetMenuToggle" aria-expanded="false" aria-controls="widgetMenuDropdown">☰ Menú</button>
+  <div class="widget-menu-dropdown" id="widgetMenuDropdown">
+    <button class="widget-menu-option" id="tapsToggle" aria-expanded="false" aria-controls="tapsPanel"><span>❤️ Taps · Top Liker</span><span id="tapsChevron">＋</span></button>
+    <section class="widget-panel" id="tapsPanel" aria-label="Widget Taps">
+      <div class="widget-panel-title"><span>❤️ Top Liker</span><button id="closeTaps" class="secondary" style="width:auto;min-height:30px;padding:4px 9px">Cerrar</button></div>
+      <iframe src="https://tikfinity.zerody.one/widget/topliker?cid=3822971" title="TikFinity Top Liker" loading="lazy" allow="autoplay; clipboard-read; clipboard-write" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      <div class="widget-hint">Widget de TikFinity. Si no carga dentro de la página, puede que el sitio impida mostrarlo incrustado.</div>
+    </section>
+  </div>
+</div>
+<main class="wrap">
 <header><div class="logo">♫</div><h1>VALENTINA MUSIC</h1><p>Música y mensajes sincronizados con Valentina</p></header>
 <section class="card"><div class="status"><span id="dot" class="dot"></span><span id="statusText">Desconectada</span></div><button id="connectBtn">⟷ Conectar con Valentina</button><p class="small" id="helpText">Abre esta página en el iPhone y pulsa Conectar. En el PC, abre el LIVE de TikTok y activa el conector Valentina Music Bridge.</p></section>
 <section class="card"><h2 class="section-title">🎵 Reproductor de audio</h2><div id="nowPlaying" class="item"><strong>Nada reproduciéndose</strong><small>Las canciones solicitadas por el chat aparecerán aquí.</small></div><div class="row"><button id="enableAudioBtn">🔊 Activar audio</button><button id="playBtn" disabled>▶ Reproducir</button></div><div class="row"><button id="nextBtn" class="secondary" disabled>⏭ Saltar canción (!skip)</button><button id="stopVoiceBtn" class="secondary">Detener voz</button></div><label class="toggle"><input id="autoPlay" type="checkbox" checked> Intentar reproducir automáticamente cuando sea posible</label><label class="small" for="volume">Volumen</label><input id="volume" type="range" min="0" max="100" value="75"><p id="playerNote" class="small">Usa !play canción o ¡play canción en el chat para pedir música, y !skip o ¡skip para saltar. Al conectar se limpia la cola antigua. La reproducción usa el reproductor oficial de YouTube visible para que los navegadores móviles permitan iniciar el audio. En móvil puede ser necesario pulsar Activar audio una vez; después la página intentará pasar a la siguiente canción sola. La reproducción en segundo plano depende del navegador y del sistema.</p><div id="ytPlayerHost"><div id="ytPlayer"></div></div></section>
@@ -19,6 +45,14 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
 <section class="card"><h2 class="section-title">💬 Mensajes del LIVE</h2><label class="toggle"><input id="readMessages" type="checkbox" checked> Leer los mensajes en voz alta</label><label class="toggle"><input id="readNames" type="checkbox" checked> Leer también el nombre del usuario</label><label class="small" for="voiceSelect">Voz disponible en el iPhone</label><select id="voiceSelect" style="width:100%;padding:10px;border-radius:10px;background:#100c16;color:#fff;border:1px solid #53336b"></select><label class="small" for="speed">Velocidad de voz</label><input id="speed" type="range" min="0.6" max="1.8" step="0.1" value="1"><label class="small" for="speechVolume">Volumen de voz</label><input id="speechVolume" type="range" min="0" max="1" step="0.05" value="1"><button id="testVoice" class="secondary" style="margin-top:8px">Probar voz</button><div class="queue" id="messages" style="margin-top:12px"><div class="item"><small>Los comentarios aparecerán cuando Valentina esté conectada.</small></div></div><button id="clearMessages" class="secondary" style="margin-top:10px">Limpiar mensajes de esta pantalla</button></section>
 <div class="footer">Valentina Music Bridge · conexión en tiempo real</div></main>
 <script type="module">
+
+// Menú flotante para abrir/cerrar el widget de TikFinity.
+const widgetMenu=$("widgetMenu"),widgetMenuToggle=$("widgetMenuToggle"),widgetMenuDropdown=$("widgetMenuDropdown"),tapsToggle=$("tapsToggle"),tapsPanel=$("tapsPanel");
+widgetMenuToggle.addEventListener("click",()=>{const open=!widgetMenuDropdown.classList.contains("open");widgetMenuDropdown.classList.toggle("open",open);widgetMenuToggle.setAttribute("aria-expanded",String(open));});
+tapsToggle.addEventListener("click",()=>{const open=!tapsPanel.classList.contains("open");tapsPanel.classList.toggle("open",open);tapsToggle.setAttribute("aria-expanded",String(open));$("tapsChevron").textContent=open?"−":"＋";});
+$("closeTaps").addEventListener("click",()=>{tapsPanel.classList.remove("open");tapsToggle.setAttribute("aria-expanded","false");$("tapsChevron").textContent="＋";});
+document.addEventListener("click",e=>{if(!widgetMenu.contains(e.target)){widgetMenuDropdown.classList.remove("open");widgetMenuToggle.setAttribute("aria-expanded","false");}});
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { getDatabase, ref, onValue, query, limitToLast, update, remove, set } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
@@ -66,11 +100,18 @@ function runSpeechQueue(){
 }
 function activateAudio(){
   audioUnlocked=true;
+  // Manda la orden al reproductor dentro del gesto del clic antes de iniciar TTS.
+  if(pendingVideo&&ytReady&&yt){
+    try{
+      yt.unMute();
+      yt.setVolume(Math.max(0,Math.min(100,Number($("volume").value)||0)));
+      if($("autoPlay").checked)startVideo(pendingVideo);else yt.playVideo();
+    }catch(e){console.warn("No se pudo activar el reproductor",e)}
+  }
   if("speechSynthesis"in window){
     try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance("Audio activado");u.lang="es-ES";u.volume=1;u.rate=1;u.onend=()=>{speechBusy=false;runSpeechQueue()};u.onerror=()=>{speechBusy=false;runSpeechQueue()};speechSynthesis.speak(u)}catch(e){}
   }
-  if(pendingVideo&&ytReady&&yt){try{if($("autoPlay").checked)startVideo(pendingVideo);else{yt.unMute();yt.setVolume(Number($("volume").value));yt.playVideo()}}catch(e){}}
-  $("playerNote").textContent="Audio activado. Las canciones nuevas intentarán reproducirse automáticamente; el navegador puede exigir una interacción adicional.";
+  $("playerNote").textContent="Audio activado. La página intentará iniciar cada canción automáticamente; si el navegador bloquea el audio, pulsa Reproducir una vez.";
 }
 function renderList(id,value,empty){
   const root=$(id);root.replaceChildren();
@@ -197,15 +238,13 @@ function nextTrack(){
         :"No hay otra canción en cola.";
       return;
     }
-    loadTrack(next,false);
-    if(audioUnlocked&&$("autoPlay").checked&&ytReady&&yt){
-      if(startVideo(next.videoId)){
-        playedIds.add(next._id);
-        $("playerNote").textContent="Reproduciendo automáticamente la siguiente canción.";
-      }else $("playerNote").textContent="No se pudo iniciar automáticamente. Pulsa Reproducir.";
+    const canAuto=audioUnlocked&&$("autoPlay").checked&&ytReady&&yt;
+    loadTrack(next,!!canAuto);
+    if(canAuto){
+      $("playerNote").textContent="Iniciando automáticamente la siguiente canción.";
     }else{
       if(ytReady&&yt)yt.cueVideoById(next.videoId);
-      $("playerNote").textContent="Siguiente canción preparada. Activa el audio para continuar automáticamente.";
+      $("playerNote").textContent="Siguiente canción preparada. Pulsa Activar audio una vez para permitir la reproducción automática.";
     }
   } finally {advancing=false}
 }
@@ -269,14 +308,10 @@ function attach(){clearListeners();unsubs.push(onValue(ref(db,`rooms/${room}/pc/
   // Solo iniciar una petición automáticamente cuando el reproductor esté libre.
   // Si ya hay una canción cargada/reproduciéndose, una petición nueva se queda en cola.
   const first=queueItems.find(x=>!playedIds.has(x._id));
-  if(!currentId && first && first.videoId){
-    loadTrack(first,false);
-    if(audioUnlocked&&$("autoPlay").checked&&ytReady&&yt){
-      try{
-        startVideo(first.videoId);
-        $("playerNote").textContent="Reproduciendo la primera canción. Las nuevas peticiones esperan su turno.";
-      }catch(e){$("playerNote").textContent="Toca Reproducir para iniciar esta canción."}
-    }
+  if(first && first.videoId && (!currentId || (currentId===first._id && !pendingVideo))){
+    const canAuto=audioUnlocked&&$("autoPlay").checked&&ytReady&&yt;
+    loadTrack(first,!!canAuto);
+    if(canAuto)$("playerNote").textContent="Iniciando la primera canción automáticamente. Las nuevas peticiones esperan su turno.";
   }
 },()=>status("Error leyendo la cola · revisa permisos de Firebase","err")));unsubs.push(onValue(ref(db,`rooms/${room}/control/skip`),snap=>handleRemoteSkip(snap.val()),()=>{}));let messagesSnapshotPrimed=false;
 unsubs.push(onValue(query(ref(db,`rooms/${room}/messages`),limitToLast(35)),snap=>{
