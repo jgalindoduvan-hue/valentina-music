@@ -47,7 +47,7 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
 <script type="module">
 
 // Menú flotante para abrir/cerrar el widget de TikFinity.
-const widgetMenu=$("widgetMenu"),widgetMenuToggle=$("widgetMenuToggle"),widgetMenuDropdown=$("widgetMenuDropdown"),tapsToggle=$("tapsToggle"),tapsPanel=$("tapsPanel");
+const widgetMenu=document.getElementById("widgetMenu"),widgetMenuToggle=document.getElementById("widgetMenuToggle"),widgetMenuDropdown=document.getElementById("widgetMenuDropdown"),tapsToggle=document.getElementById("tapsToggle"),tapsPanel=document.getElementById("tapsPanel");
 widgetMenuToggle.addEventListener("click",()=>{const open=!widgetMenuDropdown.classList.contains("open");widgetMenuDropdown.classList.toggle("open",open);widgetMenuToggle.setAttribute("aria-expanded",String(open));});
 tapsToggle.addEventListener("click",()=>{const open=!tapsPanel.classList.contains("open");tapsPanel.classList.toggle("open",open);tapsToggle.setAttribute("aria-expanded",String(open));$("tapsChevron").textContent=open?"−":"＋";});
 $("closeTaps").addEventListener("click",()=>{tapsPanel.classList.remove("open");tapsToggle.setAttribute("aria-expanded","false");$("tapsChevron").textContent="＋";});
