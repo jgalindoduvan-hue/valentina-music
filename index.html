@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#100b18"><title>Sue + Valentina Music Bridge</title>
+<meta name="theme-color" content="#100b18"><title>Sue + Valentina Music Bridge · ajustes conservadores</title>
 <style>
 :root{color-scheme:dark;--bg:#0d0a12;--panel:#17111f;--line:#382044;--pink:#ff39d2;--purple:#a83cff;--muted:#b8a9c8;--good:#69f0ae;--bad:#ff8b9b}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#251033 0,#0d0a12 55%);color:#fff;font:16px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -22,7 +22,7 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
 .gift-image.show{opacity:1;transform:scale(1) rotate(0)}.gift-image.pulse{animation:pulse 1s ease-in-out infinite alternate}@keyframes pulse{to{transform:scale(1.09);filter:drop-shadow(0 0 14px #ff55d9) drop-shadow(0 0 26px #ff91e5)}}
 .sue-caption{position:absolute;z-index:5;left:50%;bottom:10px;transform:translateX(-50%);width:min(90%,520px);text-align:center;padding:10px 14px;border:1px solid #ff9ee4;border-radius:22px;background:linear-gradient(135deg,#421642f2,#1b1029f5);box-shadow:0 0 24px #ff40b54d,inset 0 0 18px #ff5abf12;color:#ffc7ef;font-size:clamp(15px,2.5vw,22px);font-weight:800;text-shadow:0 0 12px #ff4fc3;overflow-wrap:anywhere}
 .sue-caption span{display:block;color:#fff;font-size:clamp(11px,1.6vw,15px);margin-top:3px;font-weight:500;text-shadow:none}
-.sue-taps{position:absolute;z-index:6;right:max(5px,1vw);top:50%;transform:translateY(-50%);width:clamp(105px,22%,190px);height:clamp(180px,37vh,330px);border:0!important;outline:0;background:transparent!important;opacity:.92;pointer-events:none}
+.sue-taps{position:absolute;z-index:6;right:max(5px,1vw);top:50%;transform:translateY(-50%);width:clamp(105px,22%,190px);height:clamp(180px,37vh,330px);border:0!important;outline:0;background:transparent!important;box-shadow:none!important;display:block;opacity:.98;pointer-events:none}
 .sue-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;padding:4px 0 8px}.sue-controls input{max-width:130px}.sue-status{font-size:12px;color:#f6c5ed;text-align:center;min-height:18px;width:100%}
 @media(max-width:600px){.wrap{padding:8px 9px calc(20px + env(safe-area-inset-bottom))}.sue-hero{height:76svh;min-height:440px;border-radius:14px}.sue-stage{height:94%;max-width:84%}.sue-taps{right:2px;width:24%;height:clamp(150px,30vh,245px);opacity:.96}.sue-caption{bottom:7px;padding:8px 10px;width:92%}}
 @media(max-width:380px){.sue-stage{max-width:87%}.sue-taps{width:22%;height:170px}.sue-hero{min-height:410px}}
@@ -118,7 +118,7 @@ const firebaseConfig={apiKey:"AIzaSyA5YD-m6NZXyic16A0yHXo7RNJ5b-8U8Uk",authDomai
 const $=id=>document.getElementById(id),app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app),room="main";
 let connected=false,unsubs=[],yt=null,ytReady=false,queueItems=[],playedIds=new Set(),currentId="",pendingVideo="",lastSkipAt=0,skipListenerPrimed=false;
 function status(t,k=""){ $("statusText").textContent=t;$("dot").className="dot"+(k?" "+k:"");}
-function cleanText(t){return String(t||"").replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,"").replace(/\s+/g," ").trim()}
+function cleanText(t){return String(t||"").replace(/[\p{Extended_Pictographic}\p{Emoji_Presentation}\uFE0E\uFE0F\u200D\u20E3]/gu,"").replace(/[\u{1F1E6}-\u{1F1FF}]/gu,"").replace(/\s+/g," ").trim()}
 const speechQueue=[];
 let speechBusy=false,audioUnlocked=false;
 let musicDucked=false;
@@ -388,7 +388,7 @@ unsubs.push(onValue(query(ref(db,`rooms/${room}/messages`),limitToLast(35)),snap
       if(item&&shouldReadMessage(item))speak(item);
     }
   }
-},()=>status("Error leyendo mensajes · revisa permisos de Firebase","err")));unsubs.push(onValue(ref(db,`rooms/${room}/nowPlaying`),snap=>{const item=snap.val();if(item?.videoId&&item.videoId!==pendingVideo)loadTrack(item,$("autoPlay").checked)},()=>{}))}
+},()=>status("Error leyendo mensajes · revisa permisos de Firebase","err")));let giftsSnapshotPrimed=false;unsubs.push(onValue(query(ref(db,`rooms/${room}/gifts`),limitToLast(10)),snap=>{const data=snap.val();const entries=data&&typeof data==="object"?Object.entries(data).sort((a,b)=>(a[1]?.createdAt||0)-(b[1]?.createdAt||0)):[];if(!giftsSnapshotPrimed){giftsSnapshotPrimed=true;return;}for(const [id,item] of entries){window.__shownGiftIds=window.__shownGiftIds||new Set();if(window.__shownGiftIds.has(id))continue;window.__shownGiftIds.add(id);if(item)window.SueWidget?.triggerGift({name:item.giftName||item.name||item.gift||"",username:item.username||item.user||"Alguien",imageUrl:item.imageUrl||item.giftImageUrl||""});}},()=>{}));unsubs.push(onValue(ref(db,`rooms/${room}/nowPlaying`),snap=>{const item=snap.val();if(item?.videoId&&item.videoId!==pendingVideo)loadTrack(item,$("autoPlay").checked)},()=>{}))}
 $("connectBtn").addEventListener("click",async()=>{$("connectBtn").disabled=true;status("Conectando…");try{if(!auth.currentUser)await signInAnonymously(auth);connected=true;await remove(ref(db,`rooms/${room}/queue`));await remove(ref(db,`rooms/${room}/nowPlaying`));queueItems=[];playedIds.clear();currentId="";pendingVideo="";lastSkipAt=0;skipListenerPrimed=false;if(ytReady&&yt){try{yt.stopVideo();yt.cueVideoById("")}catch(e){}}const a=document.createElement("strong");a.textContent="Nada reproduciéndose";const b=document.createElement("small");b.textContent="Esperando una canción nueva.";$("nowPlaying").replaceChildren(a,b);$("queue").replaceChildren();const empty=document.createElement("div");empty.className="item";empty.textContent="No hay canciones pendientes.";$("queue").append(empty);$("playBtn").disabled=true;$("nextBtn").disabled=true;$("connectBtn").textContent="✓ Conectada";$("helpText").textContent="Conectada. La cola empieza vacía y solo se añadirán canciones nuevas desde ahora.";attach()}catch(e){console.error(e);status("No se pudo conectar. Revisa Authentication y las reglas de Firebase.","err");$("helpText").textContent="Firebase rechazó el acceso. No abras reglas al público; comprueba el inicio anónimo y las reglas autenticadas.";$("connectBtn").textContent="Reintentar conexión"}finally{$("connectBtn").disabled=false}});
 onAuthStateChanged(auth,user=>{if(user&&connected)attach()});
 $("clearMessages").addEventListener("click",()=>{$("messages").replaceChildren();const e=document.createElement("div");e.className="item";e.textContent="Mensajes ocultos en esta pantalla; no se borraron de Firebase."; $("messages").append(e)});
