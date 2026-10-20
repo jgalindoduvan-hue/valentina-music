@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#100b18"><title>Valentina Music</title>
+<meta name="theme-color" content="#100b18"><title>Sue + Valentina Music Bridge</title>
 <style>
 :root{color-scheme:dark;--bg:#0d0a12;--panel:#17111f;--line:#382044;--pink:#ff39d2;--purple:#a83cff;--muted:#b8a9c8;--good:#69f0ae;--bad:#ff8b9b}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#251033 0,#0d0a12 55%);color:#fff;font:16px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -10,49 +10,106 @@
 .card{background:#17111fef;border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 12px 35px #0004}.status{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:14px;margin-bottom:12px}.dot{width:10px;height:10px;border-radius:50%;background:#8d8298;flex:none}.dot.ok{background:var(--good);box-shadow:0 0 12px #69f0ae88}.dot.err{background:var(--bad)}
 button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px 15px;font-weight:750;cursor:pointer;color:#fff;background:linear-gradient(100deg,var(--pink),var(--purple));width:100%;min-height:46px}button:disabled{opacity:.5}.secondary{background:#2b1c38;border:1px solid #53336b}.small{font-size:12px;color:var(--muted);line-height:1.5}.section-title{font-size:17px;margin:0 0 12px}.queue{display:grid;gap:8px}.item{padding:11px;border:1px solid #382044;border-radius:12px;background:#100c16;overflow-wrap:anywhere}.item strong{display:block}.item small{display:block;color:var(--muted);margin-top:3px}.hidden{display:none!important}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.toggle{display:flex;gap:10px;align-items:center;margin:10px 0;color:#e9dff1;font-size:14px}.toggle input{width:20px;height:20px;accent-color:#d53cff}input[type=range]{width:100%;accent-color:#ff39d2}audio{width:100%;margin-top:10px}.footer{text-align:center;color:#81748e;font-size:12px;padding:12px}#ytPlayerHost{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:12px;background:#000;margin-top:12px}#ytPlayer,#ytPlayerHost iframe{width:100%!important;height:100%!important;display:block;min-height:220px}
 
-/* Menú flotante de widgets */
-.widget-menu{position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:9999;font-size:14px}
-.widget-menu-toggle{width:auto;min-height:40px;padding:9px 13px;border:1px solid #ff39d288;border-radius:13px;background:#17111ff2;box-shadow:0 0 18px #b700ff35;backdrop-filter:blur(12px)}
-.widget-menu-dropdown{display:none;position:absolute;right:0;top:47px;width: min(440px, calc(100vw - 24px));border:1px solid #6a3582;border-radius:16px;background:#130d1cf7;box-shadow:0 16px 48px #0009;padding:10px;}
-.widget-menu-dropdown.open{display:block}
-.widget-menu-option{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:11px 12px;min-height:42px;background:#281636;border:1px solid #633778;border-radius:11px}
-.widget-panel{display:none;margin-top:10px;border:1px solid #472457;border-radius:12px;overflow:hidden;background:#09070d}
-.widget-panel.open{display:block}
-.widget-panel-title{padding:9px 10px;color:#f5dfff;font-weight:750;display:flex;align-items:center;justify-content:space-between}
-.widget-panel iframe{display:block;width:100%;height:310px;border:0;background:#09070d}
-.widget-hint{font-size:11px;color:#b8a9c8;padding:0 10px 9px;line-height:1.4}
-@media(max-width:480px){.widget-menu{top:max(8px,env(safe-area-inset-top));right:8px}.widget-menu-toggle{min-height:38px;padding:8px 10px}.widget-panel iframe{height:280px}}
+
+
+
+/* Sue ocupa la primera pantalla; controles de música y voz permanecen debajo. */
+.sue-hero{position:relative;width:100%;height:min(82svh,900px);min-height:490px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin:0 auto 12px;background:radial-gradient(ellipse at 50% 44%,#5a245d 0,#24102f 48%,#090811 100%);border-radius:18px}
+.sue-stage{position:relative;height:96%;width:auto;aspect-ratio:2/3;max-width:78%;filter:drop-shadow(0 0 18px #ff5abf50)}
+.sue-stage .sue{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1}
+.orb-window{position:absolute;z-index:3;left:50%;top:45.7%;width:31%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(circle,rgba(255,190,241,.10),rgba(255,105,215,.04) 65%,transparent 72%)}
+.gift-image{width:72%;height:72%;object-fit:contain;filter:drop-shadow(0 0 8px #ff55d9) drop-shadow(0 0 18px #ff91e5);opacity:0;transform:scale(.4) rotate(-12deg);transition:opacity .25s,transform .45s cubic-bezier(.18,.89,.32,1.4)}
+.gift-image.show{opacity:1;transform:scale(1) rotate(0)}.gift-image.pulse{animation:pulse 1s ease-in-out infinite alternate}@keyframes pulse{to{transform:scale(1.09);filter:drop-shadow(0 0 14px #ff55d9) drop-shadow(0 0 26px #ff91e5)}}
+.sue-caption{position:absolute;z-index:5;left:50%;bottom:10px;transform:translateX(-50%);width:min(90%,520px);text-align:center;padding:10px 14px;border:1px solid #ff9ee4;border-radius:22px;background:linear-gradient(135deg,#421642f2,#1b1029f5);box-shadow:0 0 24px #ff40b54d,inset 0 0 18px #ff5abf12;color:#ffc7ef;font-size:clamp(15px,2.5vw,22px);font-weight:800;text-shadow:0 0 12px #ff4fc3;overflow-wrap:anywhere}
+.sue-caption span{display:block;color:#fff;font-size:clamp(11px,1.6vw,15px);margin-top:3px;font-weight:500;text-shadow:none}
+.sue-taps{position:absolute;z-index:6;right:max(5px,1vw);top:50%;transform:translateY(-50%);width:clamp(105px,22%,190px);height:clamp(180px,37vh,330px);border:0!important;outline:0;background:transparent!important;opacity:.92;pointer-events:none}
+.sue-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;padding:4px 0 8px}.sue-controls input{max-width:130px}.sue-status{font-size:12px;color:#f6c5ed;text-align:center;min-height:18px;width:100%}
+@media(max-width:600px){.wrap{padding:8px 9px calc(20px + env(safe-area-inset-bottom))}.sue-hero{height:76svh;min-height:440px;border-radius:14px}.sue-stage{height:94%;max-width:84%}.sue-taps{right:2px;width:24%;height:clamp(150px,30vh,245px);opacity:.96}.sue-caption{bottom:7px;padding:8px 10px;width:92%}}
+@media(max-width:380px){.sue-stage{max-width:87%}.sue-taps{width:22%;height:170px}.sue-hero{min-height:410px}}
 
 </style>
 </head>
 <body>
-<div class="widget-menu" id="widgetMenu">
-  <button class="widget-menu-toggle" id="widgetMenuToggle" aria-expanded="false" aria-controls="widgetMenuDropdown">☰ Menú</button>
-  <div class="widget-menu-dropdown" id="widgetMenuDropdown">
-    <button class="widget-menu-option" id="tapsToggle" aria-expanded="false" aria-controls="tapsPanel"><span>❤️ Taps · Top Liker</span><span id="tapsChevron">＋</span></button>
-    <section class="widget-panel" id="tapsPanel" aria-label="Widget Taps">
-      <div class="widget-panel-title"><span>❤️ Top Liker</span><button id="closeTaps" class="secondary" style="width:auto;min-height:30px;padding:4px 9px">Cerrar</button></div>
-      <iframe src="https://tikfinity.zerody.one/widget/topliker?cid=3822971" title="TikFinity Top Liker" loading="lazy" allow="autoplay; clipboard-read; clipboard-write" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-      <div class="widget-hint">Widget de TikFinity. Si no carga dentro de la página, puede que el sitio impida mostrarlo incrustado.</div>
-    </section>
-  </div>
-</div>
 <main class="wrap">
-<header><div class="logo">♫</div><h1>VALENTINA MUSIC</h1><p>Música y mensajes sincronizados con Valentina</p></header>
-<section class="card"><div class="status"><span id="dot" class="dot"></span><span id="statusText">Desconectada</span></div><button id="connectBtn">⟷ Conectar con Valentina</button><p class="small" id="helpText">Abre esta página en el iPhone y pulsa Conectar. En el PC, abre el LIVE de TikTok y activa el conector Valentina Music Bridge.</p></section>
+<section class="sue-hero" aria-label="Sue y regalos de TikTok">
+  <iframe class="sue-taps" id="taps" title="TikFinity Top Liker" src="https://tikfinity.zerody.one/widget/topliker?cid=3822971" allow="autoplay" loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  <div class="sue-stage" id="character">
+    <img class="sue" id="sue" alt="Sue sosteniendo una esfera cristalina" src="https://raw.githubusercontent.com/jgalindoduvan-hue/sue/main/Chica%20m%C3%A1gica%20con%20orbe%20cristalino.png">
+    <div class="orb-window" id="orb"><img class="gift-image" id="giftImage" alt="Regalo recibido"></div>
+  </div>
+  <div class="sue-caption"><strong id="thanks">✨ ¡Gracias por estar aquí! 💗</strong><span id="giftLabel">Los regalos aparecerán aquí dentro de la esfera</span></div>
+</section>
+<section class="sue-controls" aria-label="Estado del catálogo"><span class="sue-status" id="giftStatus">Cargando catálogo de regalos…</span></section>
+<section class="card"><div class="status"><span id="dot" class="dot"></span><span id="statusText">Desconectada</span></div><button id="connectBtn">⟷ Conectar con Valentina</button><p class="small" id="helpText">Pulsa Conectar para recibir mensajes y música de Valentina. Los taps se muestran junto a Sue.</p></section>
 <section class="card"><h2 class="section-title">🎵 Reproductor de audio</h2><div id="nowPlaying" class="item"><strong>Nada reproduciéndose</strong><small>Las canciones solicitadas por el chat aparecerán aquí.</small></div><div class="row"><button id="enableAudioBtn">🔊 Activar audio</button><button id="playBtn" disabled>▶ Reproducir</button></div><div class="row"><button id="nextBtn" class="secondary" disabled>⏭ Saltar canción (!skip)</button><button id="stopVoiceBtn" class="secondary">Detener voz</button></div><label class="toggle"><input id="autoPlay" type="checkbox" checked> Intentar reproducir automáticamente cuando sea posible</label><label class="small" for="volume">Volumen</label><input id="volume" type="range" min="0" max="100" value="75"><p id="playerNote" class="small">Usa !play canción o ¡play canción en el chat para pedir música, y !skip o ¡skip para saltar. Al conectar se limpia la cola antigua. La reproducción usa el reproductor oficial de YouTube visible para que los navegadores móviles permitan iniciar el audio. En móvil puede ser necesario pulsar Activar audio una vez; después la página intentará pasar a la siguiente canción sola. La reproducción en segundo plano depende del navegador y del sistema.</p><div id="ytPlayerHost"><div id="ytPlayer"></div></div></section>
 <section class="card"><h2 class="section-title">📃 Cola musical</h2><button id="clearQueue" class="secondary" style="margin-bottom:10px">Borrar lista musical</button><div id="queue" class="queue"><div class="item"><small>Esperando peticiones musicales…</small></div></div></section>
 <section class="card"><h2 class="section-title">💬 Mensajes del LIVE</h2><label class="toggle"><input id="readMessages" type="checkbox" checked> Leer los mensajes en voz alta</label><label class="toggle"><input id="readNames" type="checkbox" checked> Leer también el nombre del usuario</label><label class="small" for="voiceSelect">Voz disponible en el iPhone</label><select id="voiceSelect" style="width:100%;padding:10px;border-radius:10px;background:#100c16;color:#fff;border:1px solid #53336b"></select><label class="small" for="speed">Velocidad de voz</label><input id="speed" type="range" min="0.6" max="1.8" step="0.1" value="1"><label class="small" for="speechVolume">Volumen de voz</label><input id="speechVolume" type="range" min="0" max="1" step="0.05" value="1"><button id="testVoice" class="secondary" style="margin-top:8px">Probar voz</button><div class="queue" id="messages" style="margin-top:12px"><div class="item"><small>Los comentarios aparecerán cuando Valentina esté conectada.</small></div></div><button id="clearMessages" class="secondary" style="margin-top:10px">Limpiar mensajes de esta pantalla</button></section>
 <div class="footer">Valentina Music Bridge v0.4.9 · conexión en tiempo real</div></main>
+<script>
+
+(() => {
+ const OWNER='jgalindoduvan-hue', REPO='imagenes-regalos-tiktok';
+ const API=`https://api.github.com/repos/${OWNER}/${REPO}`;
+ let RAW='';
+ const giftImage=document.getElementById('giftImage');
+ const status=document.getElementById('giftStatus'), thanks=document.getElementById('thanks'), giftLabel=document.getElementById('giftLabel');
+ let catalog=[],hideTimer=null;
+ const norm=s=>(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/^[0-9]+[_ .-]*/,'').replace(/[^a-z0-9]/g,'');
+ const isImage=p=>/\.(png|jpe?g|gif|webp|avif|svg)$/i.test(p);
+ async function loadCatalog(){
+  try{
+   status.textContent='Consultando repositorio…';
+   const headers={'Accept':'application/vnd.github+json'};
+   const request=async url=>{
+    const r=await fetch(url,{headers});
+    if(!r.ok) throw Error(`GitHub respondió ${r.status}`);
+    return r.json();
+   };
+   const meta=await request(API);
+   const branch=meta.default_branch||'main';
+   RAW=`https://raw.githubusercontent.com/${OWNER}/${REPO}/${encodeURIComponent(branch)}/`;
+   // Enumerate each directory separately, avoiding omissions from a recursive tree response.
+   const pending=[''];
+   const found=[];
+   while(pending.length){
+    const dir=pending.pop();
+    const url=`${API}/contents/${dir.split('/').map(encodeURIComponent).join('/')}?ref=${encodeURIComponent(branch)}`;
+    const entries=await request(url);
+    if(!Array.isArray(entries)) continue;
+    for(const entry of entries){
+     if(entry.type==='dir') pending.push(entry.path);
+     else if(entry.type==='file'&&isImage(entry.name)){
+      found.push({name:entry.name.replace(/\.[^.]+$/,''),path:entry.path,url:RAW+entry.path.split('/').map(encodeURIComponent).join('/')});
+     }
+    }
+   }
+   catalog=found.sort((a,b)=>a.path.localeCompare(b.path,undefined,{numeric:true,sensitivity:'base'}));
+   // Extract numeric ID from filenames such as 043_Qui_reme.png. Keep original filenames unchanged.
+   catalog=catalog.map(item=>({...item,number:(item.path.split('/').pop().match(/^(\d{1,3})[_ .-]/)||[])[1] ? Number((item.path.split('/').pop().match(/^(\d{1,3})[_ .-]/)||[])[1]) : null}));
+   status.textContent=catalog.length?`${catalog.length} imágenes encontradas en GitHub`:'No se encontraron imágenes';
+   if(catalog.length<788) console.warn(`GitHub devuelve ${catalog.length} imágenes. Si esperabas 788, comprueba que las 63 restantes estén confirmadas (commit) en la rama ${branch}.`);
+  }catch(e){status.textContent=`Error al cargar catálogo: ${e.message}`;console.warn(e)}
+ }
+ function chooseGift(name,user,url){
+  const q=norm(name);let item=null;
+  if(url)item={name:name||'Regalo',url};
+  else if(catalog.length){item=catalog.find(x=>norm(x.name)===q)||catalog.find(x=>q&&(norm(x.name).includes(q)||q.includes(norm(x.name))))||null;}
+  if(!item&&catalog.length&&!q)item=catalog[Math.floor(Math.random()*catalog.length)];
+  if(!item&&catalog.length&&q){status.textContent=`No encontré una imagen para: ${name}`;return false;}
+  if(!item){status.textContent='Catálogo no disponible: revisa el repositorio';return false;}
+  giftImage.classList.remove('show','pulse');giftImage.onload=()=>{giftImage.classList.add('show','pulse')};giftImage.onerror=()=>{status.textContent='No se pudo abrir esta imagen';giftImage.classList.remove('show','pulse')};giftImage.src=item.url;
+  thanks.textContent=`¡Gracias por el regalo${user?' , '+user:''}! 💗`.replace(' ,',',');giftLabel.textContent=item.name+(name&&norm(item.name)!==norm(name)?` · solicitado: ${name}`:'');
+  clearTimeout(hideTimer);hideTimer=setTimeout(()=>{giftImage.classList.remove('pulse');},7000);return true;
+ }
+ // Public integration point for a later Valentina connector: SueWidget.triggerGift({name, username, imageUrl}).
+ window.SueWidget={triggerGift:(data={})=>chooseGift(data.name||data.giftName||'',data.username||data.user||'',data.imageUrl||data.giftImageUrl||''),getCatalog:()=>catalog.slice()};
+ // Optional same-page integration event.
+ window.addEventListener('sue-gift',e=>window.SueWidget.triggerGift(e.detail||{}));
+ loadCatalog();
+})();
+
+</script>
 <script type="module">
-
-// Menú flotante para abrir/cerrar el widget de TikFinity.
-const widgetMenu=document.getElementById("widgetMenu"),widgetMenuToggle=document.getElementById("widgetMenuToggle"),widgetMenuDropdown=document.getElementById("widgetMenuDropdown"),tapsToggle=document.getElementById("tapsToggle"),tapsPanel=document.getElementById("tapsPanel");
-widgetMenuToggle.addEventListener("click",()=>{const open=!widgetMenuDropdown.classList.contains("open");widgetMenuDropdown.classList.toggle("open",open);widgetMenuToggle.setAttribute("aria-expanded",String(open));});
-tapsToggle.addEventListener("click",()=>{const open=!tapsPanel.classList.contains("open");tapsPanel.classList.toggle("open",open);tapsToggle.setAttribute("aria-expanded",String(open));document.getElementById("tapsChevron").textContent=open?"−":"＋";});
-document.getElementById("closeTaps").addEventListener("click",()=>{tapsPanel.classList.remove("open");tapsToggle.setAttribute("aria-expanded","false");document.getElementById("tapsChevron").textContent="＋";});
-document.addEventListener("click",e=>{if(!widgetMenu.contains(e.target)){widgetMenuDropdown.classList.remove("open");widgetMenuToggle.setAttribute("aria-expanded","false");}});
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { getDatabase, ref, onValue, query, limitToLast, update, remove, set } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
