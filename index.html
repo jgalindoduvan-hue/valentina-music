@@ -22,10 +22,10 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
 .gift-image.show{opacity:1;transform:scale(1) rotate(0)}.gift-image.pulse{animation:pulse 1s ease-in-out infinite alternate}@keyframes pulse{to{transform:scale(1.09);filter:drop-shadow(0 0 14px #ff55d9) drop-shadow(0 0 26px #ff91e5)}}
 .sue-caption{position:absolute;z-index:5;left:50%;bottom:10px;transform:translateX(-50%);width:min(90%,520px);text-align:center;padding:10px 14px;border:1px solid #ff9ee4;border-radius:22px;background:linear-gradient(135deg,#421642f2,#1b1029f5);box-shadow:0 0 24px #ff40b54d,inset 0 0 18px #ff5abf12;color:#ffc7ef;font-size:clamp(15px,2.5vw,22px);font-weight:800;text-shadow:0 0 12px #ff4fc3;overflow-wrap:anywhere}
 .sue-caption span{display:block;color:#fff;font-size:clamp(11px,1.6vw,15px);margin-top:3px;font-weight:500;text-shadow:none}
-.sue-taps{position:absolute;z-index:6;right:max(5px,1vw);top:50%;transform:translateY(-50%);width:clamp(105px,22%,190px);height:clamp(180px,37vh,330px);border:0!important;outline:0;background:transparent!important;box-shadow:none!important;display:block;opacity:.98;pointer-events:none}
+.sue-taps{position:absolute;z-index:6;right:max(5px,1vw);top:50%;transform:translateY(-50%);width:clamp(105px,22%,190px);height:clamp(180px,37vh,330px);border:0!important;outline:0;background:transparent!important;box-shadow:none!important;display:block;opacity:1;pointer-events:none;mix-blend-mode:darken;isolation:isolate}
 .sue-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;padding:4px 0 8px}.sue-controls input{max-width:130px}.sue-status{font-size:12px;color:#f6c5ed;text-align:center;min-height:18px;width:100%}
-@media(max-width:600px){.wrap{padding:8px 9px calc(20px + env(safe-area-inset-bottom))}.sue-hero{height:76svh;min-height:440px;border-radius:14px}.sue-stage{height:94%;max-width:84%}.sue-taps{right:2px;width:24%;height:clamp(150px,30vh,245px);opacity:.96}.sue-caption{bottom:7px;padding:8px 10px;width:92%}}
-@media(max-width:380px){.sue-stage{max-width:87%}.sue-taps{width:22%;height:170px}.sue-hero{min-height:410px}}
+@media(max-width:600px){.wrap{padding:8px 9px calc(20px + env(safe-area-inset-bottom))}.sue-hero{height:76svh;min-height:440px;border-radius:14px}.sue-stage{height:94%;max-width:84%}.sue-taps{right:2px;width:24%;height:clamp(150px,30vh,245px);opacity:1;mix-blend-mode:darken}.sue-caption{bottom:7px;padding:8px 10px;width:92%}}
+@media(max-width:380px){.sue-stage{max-width:87%}.sue-taps{width:22%;height:170px;mix-blend-mode:darken}.sue-hero{min-height:410px}}
 
 </style>
 </head>
@@ -39,12 +39,12 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
   </div>
   <div class="sue-caption"><strong id="thanks">✨ ¡Gracias por estar aquí! 💗</strong><span id="giftLabel">Los regalos aparecerán aquí dentro de la esfera</span></div>
 </section>
-<section class="sue-controls" aria-label="Estado del catálogo"><span class="sue-status" id="giftStatus">Cargando catálogo de regalos…</span></section>
+<section class="sue-controls" aria-label="Estado del catálogo"><span class="sue-status" id="giftStatus">Cargando catálogo de regalos…</span><button type="button" id="testGiftBtn" class="secondary" style="max-width:260px">🎁 Probar regalo en la esfera</button></section>
 <section class="card"><div class="status"><span id="dot" class="dot"></span><span id="statusText">Desconectada</span></div><button id="connectBtn">⟷ Conectar con Valentina</button><p class="small" id="helpText">Pulsa Conectar para recibir mensajes y música de Valentina. Los taps se muestran junto a Sue.</p></section>
 <section class="card"><h2 class="section-title">🎵 Reproductor de audio</h2><div id="nowPlaying" class="item"><strong>Nada reproduciéndose</strong><small>Las canciones solicitadas por el chat aparecerán aquí.</small></div><div class="row"><button id="enableAudioBtn">🔊 Activar audio</button><button id="playBtn" disabled>▶ Reproducir</button></div><div class="row"><button id="nextBtn" class="secondary" disabled>⏭ Saltar canción (!skip)</button><button id="stopVoiceBtn" class="secondary">Detener voz</button></div><label class="toggle"><input id="autoPlay" type="checkbox" checked> Intentar reproducir automáticamente cuando sea posible</label><label class="small" for="volume">Volumen</label><input id="volume" type="range" min="0" max="100" value="75"><p id="playerNote" class="small">Usa !play canción o ¡play canción en el chat para pedir música, y !skip o ¡skip para saltar. Al conectar se limpia la cola antigua. La reproducción usa el reproductor oficial de YouTube visible para que los navegadores móviles permitan iniciar el audio. En móvil puede ser necesario pulsar Activar audio una vez; después la página intentará pasar a la siguiente canción sola. La reproducción en segundo plano depende del navegador y del sistema.</p><div id="ytPlayerHost"><div id="ytPlayer"></div></div></section>
 <section class="card"><h2 class="section-title">📃 Cola musical</h2><button id="clearQueue" class="secondary" style="margin-bottom:10px">Borrar lista musical</button><div id="queue" class="queue"><div class="item"><small>Esperando peticiones musicales…</small></div></div></section>
 <section class="card"><h2 class="section-title">💬 Mensajes del LIVE</h2><label class="toggle"><input id="readMessages" type="checkbox" checked> Leer los mensajes en voz alta</label><label class="toggle"><input id="readNames" type="checkbox" checked> Leer también el nombre del usuario</label><label class="small" for="voiceSelect">Voz disponible en el iPhone</label><select id="voiceSelect" style="width:100%;padding:10px;border-radius:10px;background:#100c16;color:#fff;border:1px solid #53336b"></select><label class="small" for="speed">Velocidad de voz</label><input id="speed" type="range" min="0.6" max="1.8" step="0.1" value="1"><label class="small" for="speechVolume">Volumen de voz</label><input id="speechVolume" type="range" min="0" max="1" step="0.05" value="1"><button id="testVoice" class="secondary" style="margin-top:8px">Probar voz</button><div class="queue" id="messages" style="margin-top:12px"><div class="item"><small>Los comentarios aparecerán cuando Valentina esté conectada.</small></div></div><button id="clearMessages" class="secondary" style="margin-top:10px">Limpiar mensajes de esta pantalla</button></section>
-<div class="footer">Valentina Music Bridge v0.4.9 · conexión en tiempo real</div></main>
+<div class="footer">Valentina Music Bridge v0.5.0 · ajustes conservadores y pruebas</div></main>
 <script>
 
 (() => {
@@ -55,6 +55,7 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
  const status=document.getElementById('giftStatus'), thanks=document.getElementById('thanks'), giftLabel=document.getElementById('giftLabel');
  let catalog=[],hideTimer=null;
  const norm=s=>(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/^[0-9]+[_ .-]*/,'').replace(/[^a-z0-9]/g,'');
+ const isQuiereme=q=>q==='quiereme'||q==='quireme';
  const isImage=p=>/\.(png|jpe?g|gif|webp|avif|svg)$/i.test(p);
  async function loadCatalog(){
   try{
@@ -93,7 +94,7 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
  function chooseGift(name,user,url){
   const q=norm(name);let item=null;
   if(url)item={name:name||'Regalo',url};
-  else if(catalog.length){item=catalog.find(x=>norm(x.name)===q)||catalog.find(x=>q&&(norm(x.name).includes(q)||q.includes(norm(x.name))))||null;}
+  else if(catalog.length){item=(isQuiereme(q)?catalog.find(x=>x.number===43):null)||catalog.find(x=>norm(x.name)===q)||catalog.find(x=>q&&(norm(x.name).includes(q)||q.includes(norm(x.name))))||null;}
   if(!item&&catalog.length&&!q)item=catalog[Math.floor(Math.random()*catalog.length)];
   if(!item&&catalog.length&&q){status.textContent=`No encontré una imagen para: ${name}`;return false;}
   if(!item){status.textContent='Catálogo no disponible: revisa el repositorio';return false;}
@@ -105,6 +106,7 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
  window.SueWidget={triggerGift:(data={})=>chooseGift(data.name||data.giftName||'',data.username||data.user||'',data.imageUrl||data.giftImageUrl||''),getCatalog:()=>catalog.slice()};
  // Optional same-page integration event.
  window.addEventListener('sue-gift',e=>window.SueWidget.triggerGift(e.detail||{}));
+ document.getElementById('testGiftBtn')?.addEventListener('click',()=>{if(!catalog.length){status.textContent='No puedo probar todavía: el catálogo no terminó de cargar.';return;}const item=catalog[Math.floor(Math.random()*catalog.length)];const ok=window.SueWidget.triggerGift({name:item.name,username:'Prueba'});if(ok)status.textContent=`Prueba visual correcta: ${item.name} · imagen ${item.number??'sin número'}`;});
  loadCatalog();
 })();
 
@@ -118,7 +120,7 @@ const firebaseConfig={apiKey:"AIzaSyA5YD-m6NZXyic16A0yHXo7RNJ5b-8U8Uk",authDomai
 const $=id=>document.getElementById(id),app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app),room="main";
 let connected=false,unsubs=[],yt=null,ytReady=false,queueItems=[],playedIds=new Set(),currentId="",pendingVideo="",lastSkipAt=0,skipListenerPrimed=false;
 function status(t,k=""){ $("statusText").textContent=t;$("dot").className="dot"+(k?" "+k:"");}
-function cleanText(t){return String(t||"").replace(/[\p{Extended_Pictographic}\p{Emoji_Presentation}\uFE0E\uFE0F\u200D\u20E3]/gu,"").replace(/[\u{1F1E6}-\u{1F1FF}]/gu,"").replace(/\s+/g," ").trim()}
+function cleanText(t){return String(t||"").normalize("NFC").replace(/(?:[#*0-9]\uFE0F?\u20E3|\p{Extended_Pictographic}|\p{Regional_Indicator}|[\u{1F3FB}-\u{1F3FF}]|[\uFE0E\uFE0F\u200D\u20E3])+/gu,"").replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,"").replace(/\s+/g," ").trim()}
 const speechQueue=[];
 let speechBusy=false,audioUnlocked=false;
 let musicDucked=false;
@@ -142,7 +144,7 @@ function shouldReadMessage(item){
 function speak(item){
   if(!$("readMessages").checked||!("speechSynthesis"in window))return;
   const msg=cleanText(item.text||item.message||"");if(!msg||!shouldReadMessage(item))return;
-  const u=new SpeechSynthesisUtterance($("readNames").checked&&item.username?`${item.username} dice ${msg}`:msg);
+  const safeName=cleanText(item.username||"");const speechText=$("readNames").checked&&safeName?`${safeName} dice ${msg}`:msg;const u=new SpeechSynthesisUtterance(cleanText(speechText));
   u.lang="es-ES";u.rate=Number($("speed").value)||1;u.volume=Number($("speechVolume")?.value??1);
   const voices=speechSynthesis.getVoices(),chosen=voices.find(v=>v.name===$("voiceSelect").value);
   if(chosen)u.voice=chosen;
