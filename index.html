@@ -10,9 +10,6 @@
 .card{background:#17111fef;border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 12px 35px #0004}.status{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:14px;margin-bottom:12px}.dot{width:10px;height:10px;border-radius:50%;background:#8d8298;flex:none}.dot.ok{background:var(--good);box-shadow:0 0 12px #69f0ae88}.dot.err{background:var(--bad)}
 button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px 15px;font-weight:750;cursor:pointer;color:#fff;background:linear-gradient(100deg,var(--pink),var(--purple));width:100%;min-height:46px}button:disabled{opacity:.5}.secondary{background:#2b1c38;border:1px solid #53336b}.small{font-size:12px;color:var(--muted);line-height:1.5}.section-title{font-size:17px;margin:0 0 12px}.queue{display:grid;gap:8px}.item{padding:11px;border:1px solid #382044;border-radius:12px;background:#100c16;overflow-wrap:anywhere}.item strong{display:block}.item small{display:block;color:var(--muted);margin-top:3px}.hidden{display:none!important}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.toggle{display:flex;gap:10px;align-items:center;margin:10px 0;color:#e9dff1;font-size:14px}.toggle input{width:20px;height:20px;accent-color:#d53cff}input[type=range]{width:100%;accent-color:#ff39d2}audio{width:100%;margin-top:10px}.footer{text-align:center;color:#81748e;font-size:12px;padding:12px}#ytPlayerHost{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:12px;background:#000;margin-top:12px}#ytPlayer,#ytPlayerHost iframe{width:100%!important;height:100%!important;display:block;min-height:220px}
 
-
-
-
 /* Sue ocupa la primera pantalla; controles de música y voz permanecen debajo. */
 .sue-hero{position:relative;width:100%;height:min(82svh,900px);min-height:490px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin:0 auto 12px;background:radial-gradient(ellipse at 50% 44%,#5a245d 0,#24102f 48%,#090811 100%);border-radius:18px}
 .sue-stage{position:relative;height:96%;width:auto;aspect-ratio:2/3;max-width:78%;filter:drop-shadow(0 0 18px #ff5abf50)}
@@ -26,7 +23,6 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
 .sue-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;padding:4px 0 8px}.sue-controls input{max-width:130px}.sue-status{font-size:12px;color:#f6c5ed;text-align:center;min-height:18px;width:100%}
 @media(max-width:600px){.wrap{padding:8px 9px calc(20px + env(safe-area-inset-bottom))}.sue-hero{height:76svh;min-height:440px;border-radius:14px}.sue-stage{height:94%;max-width:84%}.sue-taps{right:2px;width:24%;height:clamp(150px,30vh,245px);opacity:1;mix-blend-mode:darken}.sue-caption{bottom:7px;padding:8px 10px;width:92%}}
 @media(max-width:380px){.sue-stage{max-width:87%}.sue-taps{width:22%;height:170px;mix-blend-mode:darken}.sue-hero{min-height:410px}}
-
 </style>
 </head>
 <body>
@@ -45,8 +41,8 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
 <section class="card"><h2 class="section-title">📃 Cola musical</h2><button id="clearQueue" class="secondary" style="margin-bottom:10px">Borrar lista musical</button><div id="queue" class="queue"><div class="item"><small>Esperando peticiones musicales…</small></div></div></section>
 <section class="card"><h2 class="section-title">💬 Mensajes del LIVE</h2><label class="toggle"><input id="readMessages" type="checkbox" checked> Leer los mensajes en voz alta</label><label class="toggle"><input id="readNames" type="checkbox" checked> Leer también el nombre del usuario</label><label class="small" for="voiceSelect">Voz disponible en el iPhone</label><select id="voiceSelect" style="width:100%;padding:10px;border-radius:10px;background:#100c16;color:#fff;border:1px solid #53336b"></select><label class="small" for="speed">Velocidad de voz</label><input id="speed" type="range" min="0.6" max="1.8" step="0.1" value="1"><label class="small" for="speechVolume">Volumen de voz</label><input id="speechVolume" type="range" min="0" max="1" step="0.05" value="1"><button id="testVoice" class="secondary" style="margin-top:8px">Probar voz</button><div class="queue" id="messages" style="margin-top:12px"><div class="item"><small>Los comentarios aparecerán cuando Valentina esté conectada.</small></div></div><button id="clearMessages" class="secondary" style="margin-top:10px">Limpiar mensajes de esta pantalla</button></section>
 <div class="footer">Valentina Music Bridge v0.5.0 · ajustes conservadores y pruebas</div></main>
-<script>
 
+<script>
 (() => {
  const OWNER='jgalindoduvan-hue', REPO='imagenes-regalos-tiktok';
  const API=`https://api.github.com/repos/${OWNER}/${REPO}`;
@@ -56,7 +52,6 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
  let catalog=[],hideTimer=null;
  const norm=s=>(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/^[0-9]+[_ .-]*/,'').replace(/[^a-z0-9]/g,'');
  const isQuiereme=q=>q==='quiereme'||q==='quireme'||q==='quierem';
- // Match repository filenames even when one or more letters were replaced by underscores.
  function editDistance(a,b){const row=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let prev=row[0];row[0]=i;for(let j=1;j<=b.length;j++){const old=row[j];row[j]=Math.min(row[j]+1,row[j-1]+1,prev+(a[i-1]===b[j-1]?0:1));prev=old;}}return row[b.length];}
  function matchCatalog(name){const q=norm(name);if(!q)return null;const exact=catalog.find(x=>norm(x.name)===q);if(exact)return exact;const aliases=catalog.find(x=>isQuiereme(q)&&x.number===43);if(aliases)return aliases;let best=null,bestScore=Infinity;for(const x of catalog){const n=norm(x.name);if(!n)continue;const d=editDistance(q,n);const threshold=Math.min(2,Math.floor(Math.max(q.length,n.length)/7));if(d<=threshold&&d<bestScore){best=x;bestScore=d;}}return best;}
  const isImage=p=>/\.(png|jpe?g|gif|webp|avif|svg)$/i.test(p);
@@ -64,125 +59,226 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:13px
   try{
    status.textContent='Consultando repositorio…';
    const headers={'Accept':'application/vnd.github+json'};
-   const request=async url=>{
-    const r=await fetch(url,{headers});
-    if(!r.ok) throw Error(`GitHub respondió ${r.status}`);
-    return r.json();
-   };
+   const request=async url=>{const r=await fetch(url,{headers});if(!r.ok)throw Error(`GitHub respondió ${r.status}`);return r.json();};
    const meta=await request(API);
    const branch=meta.default_branch||'main';
    RAW=`https://raw.githubusercontent.com/${OWNER}/${REPO}/${encodeURIComponent(branch)}/`;
-   // Enumerate each directory separately, avoiding omissions from a recursive tree response.
-   const pending=[''];
-   const found=[];
+   const pending=[''];const found=[];
    while(pending.length){
     const dir=pending.pop();
     const url=`${API}/contents/${dir.split('/').map(encodeURIComponent).join('/')}?ref=${encodeURIComponent(branch)}`;
     const entries=await request(url);
-    if(!Array.isArray(entries)) continue;
+    if(!Array.isArray(entries))continue;
     for(const entry of entries){
-     if(entry.type==='dir') pending.push(entry.path);
-     else if(entry.type==='file'&&isImage(entry.name)){
-      found.push({name:entry.name.replace(/\.[^.]+$/,''),path:entry.path,url:RAW+entry.path.split('/').map(encodeURIComponent).join('/')});
-     }
+     if(entry.type==='dir')pending.push(entry.path);
+     else if(entry.type==='file'&&isImage(entry.name))found.push({name:entry.name.replace(/\.[^.]+$/,''),path:entry.path,url:RAW+entry.path.split('/').map(encodeURIComponent).join('/')});
     }
    }
    catalog=found.sort((a,b)=>a.path.localeCompare(b.path,undefined,{numeric:true,sensitivity:'base'}));
-   // Extract numeric ID from filenames such as 043_Qui_reme.png. Keep original filenames unchanged.
-   catalog=catalog.map(item=>({...item,number:(item.path.split('/').pop().match(/^(\d{1,3})[_ .-]/)||[])[1] ? Number((item.path.split('/').pop().match(/^(\d{1,3})[_ .-]/)||[])[1]) : null}));
+   catalog=catalog.map(item=>({...item,number:(item.path.split('/').pop().match(/^(\d{1,3})[_ .-]/)||[])[1]?Number((item.path.split('/').pop().match(/^(\d{1,3})[_ .-]/)||[])[1]):null}));
    status.textContent=catalog.length?`${catalog.length} imágenes encontradas en GitHub`:'No se encontraron imágenes';
-   if(catalog.length<788) console.warn(`GitHub devuelve ${catalog.length} imágenes. Si esperabas 788, comprueba que las 63 restantes estén confirmadas (commit) en la rama ${branch}.`);
+   if(catalog.length<788)console.warn(`GitHub devuelve ${catalog.length} imágenes. Si esperabas 788, comprueba que las 63 restantes estén confirmadas (commit) en la rama ${branch}.`);
   }catch(e){status.textContent=`Error al cargar catálogo: ${e.message}`;console.warn(e)}
  }
  function chooseGift(name,user,url){
   const q=norm(name);let item=null;
   if(url)item={name:name||'Regalo',url};
-  else if(catalog.length){item=(isQuiereme(q)?catalog.find(x=>x.number===43):null)||matchCatalog(name)||catalog.find(x=>q&&(norm(x.name).includes(q)||q.includes(norm(x.name))))||null;}
+  else if(catalog.length)item=(isQuiereme(q)?catalog.find(x=>x.number===43):null)||matchCatalog(name)||catalog.find(x=>q&&(norm(x.name).includes(q)||q.includes(norm(x.name))))||null;
   if(!item&&catalog.length&&!q)item=catalog[Math.floor(Math.random()*catalog.length)];
   if(!item&&catalog.length&&q){status.textContent=`No encontré una imagen para: ${name}`;return false;}
   if(!item){status.textContent='Catálogo no disponible: revisa el repositorio';return false;}
-  giftImage.classList.remove('show','pulse');giftImage.onload=()=>{giftImage.classList.add('show','pulse')};giftImage.onerror=()=>{status.textContent='No se pudo abrir esta imagen';giftImage.classList.remove('show','pulse')};giftImage.src=item.url;
-  thanks.textContent=`¡Gracias por el regalo${user?' , '+user:''}! 💗`.replace(' ,',',');giftLabel.textContent=item.name+(name&&norm(item.name)!==norm(name)?` · solicitado: ${name}`:'');
-  clearTimeout(hideTimer);hideTimer=setTimeout(()=>{giftImage.classList.remove('pulse');},7000);return true;
+  giftImage.classList.remove('show','pulse');
+  giftImage.onload=()=>giftImage.classList.add('show','pulse');
+  giftImage.onerror=()=>{status.textContent='No se pudo abrir esta imagen';giftImage.classList.remove('show','pulse')};
+  giftImage.src=item.url;
+  thanks.textContent=`¡Gracias por el regalo${user?' , '+user:''}! 💗`.replace(' ,',',');
+  giftLabel.textContent=item.name+(name&&norm(item.name)!==norm(name)?` · solicitado: ${name}`:'');
+  clearTimeout(hideTimer);hideTimer=setTimeout(()=>giftImage.classList.remove('pulse'),7000);
+  return true;
  }
- // Public integration point for a later Valentina connector: SueWidget.triggerGift({name, username, imageUrl}).
  window.SueWidget={triggerGift:(data={})=>chooseGift(data.name||data.giftName||'',data.username||data.user||'',data.imageUrl||data.giftImageUrl||''),getCatalog:()=>catalog.slice()};
- // Optional same-page integration event.
  window.addEventListener('sue-gift',e=>window.SueWidget.triggerGift(e.detail||{}));
- document.getElementById('testGiftBtn')?.addEventListener('click',()=>{if(!catalog.length){status.textContent='No puedo probar todavía: el catálogo no terminó de cargar.';return;}const item=catalog[Math.floor(Math.random()*catalog.length)];const ok=window.SueWidget.triggerGift({name:item.name,username:'Prueba'});if(ok)status.textContent=`Prueba visual correcta: ${item.name} · imagen ${item.number??'sin número'}`;});
+ document.getElementById('testGiftBtn')?.addEventListener('click',()=>{
+  if(!catalog.length){status.textContent='No puedo probar todavía: el catálogo no terminó de cargar.';return;}
+  const item=catalog[Math.floor(Math.random()*catalog.length)];
+  const ok=window.SueWidget.triggerGift({name:item.name,username:'Prueba'});
+  if(ok)status.textContent=`Prueba visual correcta: ${item.name} · imagen ${item.number??'sin número'}`;
+ });
  loadCatalog();
 })();
-
 </script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { getDatabase, ref, onValue, query, limitToLast, update, remove, set } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+
 const YOUTUBE_API_KEY="AIzaSyAd4gg4sLEwuI6lzAhtU5ujI4sELhhcctk";
 const firebaseConfig={apiKey:"AIzaSyA5YD-m6NZXyic16A0yHXo7RNJ5b-8U8Uk",authDomain:"valentina-music.firebaseapp.com",databaseURL:"https://valentina-music-default-rtdb.firebaseio.com",projectId:"valentina-music",storageBucket:"valentina-music.firebasestorage.app",messagingSenderId:"802700860379",appId:"1:802700860379:web:b7f114b77101f9d4e725fe"};
+
 const $=id=>document.getElementById(id),app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app),room="main";
 let connected=false,unsubs=[],yt=null,ytReady=false,queueItems=[],playedIds=new Set(),currentId="",pendingVideo="",lastSkipAt=0,skipListenerPrimed=false;
-function status(t,k=""){ $("statusText").textContent=t;$("dot").className="dot"+(k?" "+k:"");}
+
+function status(t,k=""){$("statusText").textContent=t;$("dot").className="dot"+(k?" "+k:"");}
 function cleanText(t){return String(t||"").normalize("NFC").replace(/(?:[#*0-9]\uFE0F?\u20E3|\p{Extended_Pictographic}|\p{Regional_Indicator}|[\u{1F3FB}-\u{1F3FF}]|[\uFE0E\uFE0F\u200D\u20E3])+/gu,"").replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,"").replace(/\s+/g," ").trim()}
+
 const speechQueue=[];
 let speechBusy=false,audioUnlocked=false;
 let musicDucked=false;
+
+// Control de comentarios: últimos cinco leídos y mensajes pendientes.
+const recentSpokenIds=[];
+const recentSpokenSet=new Set();
+const queuedMessageIds=new Set();
+let activeMessageId=null;
+let lastMessageCursor=null;
+
+function rememberSpokenId(id){
+  if(!id||recentSpokenSet.has(id))return;
+  recentSpokenIds.push(id);
+  recentSpokenSet.add(id);
+
+  while(recentSpokenIds.length>5){
+    const removed=recentSpokenIds.shift();
+    recentSpokenSet.delete(removed);
+  }
+}
+
 function duckMusicForSpeech(){
   if(!ytReady||!yt||musicDucked)return;
   try{musicDucked=true;yt.setVolume(Math.max(0,Math.round(Number($("volume").value)*0.28)))}catch(e){}
 }
+
 function restoreMusicAfterSpeech(){
   if(!musicDucked)return;
   musicDucked=false;
   if(ytReady&&yt){try{yt.setVolume(Number($("volume").value))}catch(e){}}
 }
+
 function shouldReadMessage(item){
   const text=cleanText(item?.text||item?.message||"");
   if(!text)return false;
-  // TikTok system events: follows, joins, gifts/badges, rankings and notifications.
   if(/ha empezado a seguir|empez[oó] a seguir|started following|joined the live|se ha unido|entr[oó] al live|ha compartido el live|comparti[oó] el live|shared the live|has shared the live|ha enviado una rosa|envi[oó] un regalo|regalo de|N[.º°o]?\s*\d+\s*$/i.test(text))return false;
   if(/^(?:ha empezado a seguir al organizador|empez[oó] a seguir al organizador)$/i.test(text))return false;
   return true;
 }
-function speak(item){
-  if(!$("readMessages").checked||!("speechSynthesis"in window))return;
-  const msg=cleanText(item.text||item.message||"");if(!msg||!shouldReadMessage(item))return;
-  const safeName=cleanText(item.username||"");const speechText=$("readNames").checked&&safeName?`${safeName} dice ${msg}`:msg;const u=new SpeechSynthesisUtterance(cleanText(speechText));
-  u.lang="es-ES";u.rate=Number($("speed").value)||1;u.volume=Number($("speechVolume")?.value??1);
-  const voices=speechSynthesis.getVoices(),chosen=voices.find(v=>v.name===$("voiceSelect").value);
+
+function speak(item,messageId){
+  if(!messageId)return;
+  if(recentSpokenSet.has(messageId)||queuedMessageIds.has(messageId))return;
+
+  if(!$("readMessages").checked||!("speechSynthesis"in window)){
+    rememberSpokenId(messageId);
+    return;
+  }
+
+  const msg=cleanText(item.text||item.message||"");
+  if(!msg||!shouldReadMessage(item)){
+    rememberSpokenId(messageId);
+    return;
+  }
+
+  const safeName=cleanText(item.username||"");
+  const speechText=$("readNames").checked&&safeName?`${safeName} dice ${msg}`:msg;
+  const u=new SpeechSynthesisUtterance(cleanText(speechText));
+
+  u.lang="es-ES";
+  u.rate=Number($("speed").value)||1;
+  u.volume=Number($("speechVolume")?.value??1);
+
+  const voices=speechSynthesis.getVoices();
+  const chosen=voices.find(v=>v.name===$("voiceSelect").value);
   if(chosen)u.voice=chosen;
-  speechQueue.push(u);runSpeechQueue();
+
+  u.__messageId=messageId;
+  queuedMessageIds.add(messageId);
+  speechQueue.push(u);
+  runSpeechQueue();
 }
+
 function runSpeechQueue(){
   if(speechBusy||!speechQueue.length||!audioUnlocked||!("speechSynthesis"in window))return;
-  speechBusy=true;const u=speechQueue.shift();
-  u.onend=()=>{speechBusy=false;runSpeechQueue()};
-  u.onerror=()=>{speechBusy=false;runSpeechQueue()};
-  try{speechSynthesis.speak(u)}catch(e){speechBusy=false}
+
+  speechBusy=true;
+  const u=speechQueue.shift();
+  activeMessageId=u.__messageId||null;
+
+  const finish=()=>{
+    if(activeMessageId){
+      rememberSpokenId(activeMessageId);
+      queuedMessageIds.delete(activeMessageId);
+    }
+    activeMessageId=null;
+    speechBusy=false;
+
+    if(!speechQueue.length)restoreMusicAfterSpeech();
+    runSpeechQueue();
+  };
+
+  u.onend=finish;
+  u.onerror=finish;
+
+  try{
+    duckMusicForSpeech();
+    speechSynthesis.speak(u);
+  }catch(e){finish()}
 }
+
 function activateAudio(){
   audioUnlocked=true;
-  // Manda la orden al reproductor dentro del gesto del clic antes de iniciar TTS.
+
   if(pendingVideo&&ytReady&&yt){
     try{
       yt.unMute();
       yt.setVolume(Math.max(0,Math.min(100,Number($("volume").value)||0)));
-      if($("autoPlay").checked)startVideo(pendingVideo);else yt.playVideo();
+      if($("autoPlay").checked)startVideo(pendingVideo);
+      else yt.playVideo();
     }catch(e){console.warn("No se pudo activar el reproductor",e)}
   }
+
   if("speechSynthesis"in window){
-    try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance("Audio activado");u.lang="es-ES";u.volume=1;u.rate=1;u.onend=()=>{speechBusy=false;runSpeechQueue()};u.onerror=()=>{speechBusy=false;runSpeechQueue()};speechSynthesis.speak(u)}catch(e){}
+    try{
+      speechSynthesis.cancel();
+      speechBusy=false;
+      activeMessageId=null;
+      const u=new SpeechSynthesisUtterance("Audio activado");
+      u.lang="es-ES";u.volume=1;u.rate=1;
+      u.onend=()=>{speechBusy=false;runSpeechQueue()};
+      u.onerror=()=>{speechBusy=false;runSpeechQueue()};
+      speechSynthesis.speak(u);
+    }catch(e){}
   }
+
   $("playerNote").textContent="Audio activado. La página intentará iniciar cada canción automáticamente; si el navegador bloquea el audio, pulsa Reproducir una vez.";
 }
+
 function renderList(id,value,empty){
   const root=$(id);root.replaceChildren();
   const entries=value&&typeof value==="object"?Object.entries(value).sort((a,b)=>(a[1]?.createdAt||0)-(b[1]?.createdAt||0)).slice(-5):[];
   if(!entries.length){const box=document.createElement("div");box.className="item";const small=document.createElement("small");small.textContent=empty;box.append(small);root.append(box);return}
-  entries.reverse().forEach(([key,item])=>{const box=document.createElement("div");box.className="item";const strong=document.createElement("strong");strong.textContent=item?.title||item?.text||item?.message||"Mensaje";box.append(strong);if(item?.artist||item?.username){const sm=document.createElement("small");sm.textContent=item.artist||("@"+item.username);box.append(sm)}root.append(box)})
+  entries.reverse().forEach(([key,item])=>{
+    const box=document.createElement("div");box.className="item";
+    const strong=document.createElement("strong");strong.textContent=item?.title||item?.text||item?.message||"Mensaje";box.append(strong);
+    if(item?.artist||item?.username){const sm=document.createElement("small");sm.textContent=item.artist||("@"+item.username);box.append(sm)}
+    root.append(box);
+  });
 }
-function renderQueue(data){queueItems=data&&typeof data==="object"?Object.entries(data).map(([id,x])=>({...x,_id:id})).filter(x=>x&&!x.played).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)):[];const root=$("queue");root.replaceChildren();if(!queueItems.length){const b=document.createElement("div");b.className="item";b.textContent="No hay canciones pendientes.";root.append(b);$("nextBtn").disabled=true;return}queueItems.forEach((x,i)=>{const b=document.createElement("div");b.className="item";const s=document.createElement("strong");s.textContent=(i+1)+". "+(x.title||x.query||"Canción");const sm=document.createElement("small");sm.textContent=(x.artist||"")+(x.username?" · pedido por @"+x.username:"");b.append(s,sm);root.append(b)});$("nextBtn").disabled=!ytReady}
+
+function renderQueue(data){
+  queueItems=data&&typeof data==="object"?Object.entries(data).map(([id,x])=>({...x,_id:id})).filter(x=>x&&!x.played).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)):[];
+  const root=$("queue");root.replaceChildren();
+  if(!queueItems.length){const b=document.createElement("div");b.className="item";b.textContent="No hay canciones pendientes.";root.append(b);$("nextBtn").disabled=true;return}
+  queueItems.forEach((x,i)=>{
+    const b=document.createElement("div");b.className="item";
+    const s=document.createElement("strong");s.textContent=(i+1)+". "+(x.title||x.query||"Canción");
+    const sm=document.createElement("small");sm.textContent=(x.artist||"")+(x.username?" · pedido por @"+x.username:"");
+    b.append(s,sm);root.append(b);
+  });
+  $("nextBtn").disabled=!ytReady;
+}
+
 const resolving=new Set();
+
 async function resolveQueueRequests(data){
   if(!data||typeof data!=="object")return;
   for(const [id,item] of Object.entries(data)){
@@ -206,25 +302,23 @@ async function resolveQueueRequests(data){
     finally{resolving.delete(id)}
   }
 }
+
 function startVideo(videoId){
   if(!ytReady||!yt||!videoId)return false;
   const value=Math.max(0,Math.min(100,Number($("volume").value)||0));
   try{
-    yt.unMute();
-    yt.setVolume(value);
-    // loadVideoById starts playback itself; avoid a second playVideo call racing it.
-    yt.loadVideoById({videoId, startSeconds:0, suggestedQuality:"large"});
+    yt.unMute();yt.setVolume(value);
+    yt.loadVideoById({videoId,startSeconds:0,suggestedQuality:"large"});
     setTimeout(()=>{try{if(ytReady&&yt){yt.unMute();yt.setVolume(Math.max(0,Math.min(100,Number($("volume").value)||0)))}}catch(e){}},350);
     return true;
   }catch(e){console.warn("No se pudo iniciar la canción",e);return false}
 }
+
 function loadTrack(item,auto=false){
   if(!item)return;
   const id=item._id||item.videoId||"";
-  // Never reload/cue the same track on every Firebase queue update.
-  if(id===currentId && item.videoId===pendingVideo)return;
-  currentId=id;
-  pendingVideo=item.videoId||"";
+  if(id===currentId&&item.videoId===pendingVideo)return;
+  currentId=id;pendingVideo=item.videoId||"";
   const strong=document.createElement("strong");strong.textContent=item.title||item.query||"Canción";
   const sm=document.createElement("small");sm.textContent=(item.artist||"")+" · preparado para reproducir";
   $("nowPlaying").replaceChildren(strong,sm);
@@ -233,10 +327,7 @@ function loadTrack(item,auto=false){
   if(ytReady&&yt&&pendingVideo){
     try{
       if(audioUnlocked&&$("autoPlay").checked&&auto){
-        if(startVideo(pendingVideo)){
-          playedIds.add(currentId);
-          $("playerNote").textContent="Reproducción automática solicitada.";
-        }
+        if(startVideo(pendingVideo)){playedIds.add(currentId);$("playerNote").textContent="Reproducción automática solicitada."}
       }else{
         yt.cueVideoById(pendingVideo);
         yt.setVolume(Math.max(0,Math.min(100,Number($("volume").value)||0)));
@@ -246,6 +337,7 @@ function loadTrack(item,auto=false){
     }catch(e){console.warn(e);$("playerNote").textContent="No se pudo preparar el vídeo. Prueba otra canción."}
   }
 }
+
 window.onYouTubeIframeAPIReady=()=>{
   try{
     yt=new YT.Player("ytPlayer",{height:"100%",width:"100%",videoId:"",playerVars:{autoplay:0,controls:1,playsinline:1,rel:0,fs:1,enablejsapi:1},events:{
@@ -254,35 +346,28 @@ window.onYouTubeIframeAPIReady=()=>{
         yt.setVolume(Math.max(0,Math.min(100,Number($("volume").value)||0)));
         $("playBtn").disabled=!pendingVideo;
         $("nextBtn").disabled=!queueItems.some(x=>x.videoId&&!playedIds.has(x._id));
-        if(pendingVideo){
-          try{
-            if(audioUnlocked&&$("autoPlay").checked)startVideo(pendingVideo);
-            else yt.cueVideoById(pendingVideo);
-          }catch(e){}
-        }
+        if(pendingVideo){try{if(audioUnlocked&&$("autoPlay").checked)startVideo(pendingVideo);else yt.cueVideoById(pendingVideo)}catch(e){}}
       },
       onStateChange:e=>{
-        if(e.data===1){
-          // A track is considered consumed once YouTube actually starts it.
-          if(currentId)playedIds.add(currentId);
-          $("playBtn").disabled=false;
-        }
+        if(e.data===1){if(currentId)playedIds.add(currentId);$("playBtn").disabled=false}
         if(e.data===0){
           restoreMusicAfterSpeech();
           if(audioUnlocked&&$("autoPlay").checked)nextTrack();
           else $("playerNote").textContent="La canción terminó. Pulsa Activar audio para continuar automáticamente.";
         }
       },
-      onError:e=>{$("playerNote").textContent="YouTube no permite reproducir este resultado (código "+e.data+"). Pulsa Siguiente para probar otro."}
-    }})
+      onError:e=>$("playerNote").textContent="YouTube no permite reproducir este resultado (código "+e.data+"). Pulsa Siguiente para probar otro."
+    }});
   }catch(e){console.error(e);$("playerNote").textContent="No se pudo cargar el reproductor de YouTube."}
 };
-// Register the callback before loading YouTube API, avoiding the mobile race condition.
+
 const ytApiScript=document.createElement("script");
 ytApiScript.src="https://www.youtube.com/iframe_api";
 ytApiScript.async=true;
 document.head.appendChild(ytApiScript);
+
 let advancing=false;
+
 function nextTrack(){
   if(advancing)return;
   advancing=true;
@@ -302,14 +387,14 @@ function nextTrack(){
     }
     const canAuto=audioUnlocked&&$("autoPlay").checked&&ytReady&&yt;
     loadTrack(next,!!canAuto);
-    if(canAuto){
-      $("playerNote").textContent="Iniciando automáticamente la siguiente canción.";
-    }else{
+    if(canAuto)$("playerNote").textContent="Iniciando automáticamente la siguiente canción.";
+    else{
       if(ytReady&&yt)yt.cueVideoById(next.videoId);
       $("playerNote").textContent="Siguiente canción preparada. Pulsa Activar audio una vez para permitir la reproducción automática.";
     }
-  } finally {advancing=false}
+  }finally{advancing=false}
 }
+
 function handleRemoteSkip(item){
   const at=Number(item?.createdAt)||0;
   if(!skipListenerPrimed){skipListenerPrimed=true;lastSkipAt=at;return}
@@ -319,6 +404,7 @@ function handleRemoteSkip(item){
   nextTrack();
   status(`⏭ Canción saltada por @${item.username||"chat"}`,"ok");
 }
+
 $("playBtn").addEventListener("click",()=>{
   if(!ytReady||!yt||!pendingVideo){$("playerNote").textContent="Todavía no hay una canción preparada.";return}
   try{
@@ -331,7 +417,9 @@ $("playBtn").addEventListener("click",()=>{
     }else $("playerNote").textContent="No se pudo iniciar. Vuelve a pulsar Reproducir.";
   }catch(e){$("playerNote").textContent="No se pudo iniciar. Vuelve a pulsar Reproducir."}
 });
+
 $("nextBtn").addEventListener("click",nextTrack);
+
 function applyMusicVolume(){
   const value=Math.max(0,Math.min(100,Number($("volume").value)||0));
   $("volume").setAttribute("aria-valuetext",value+" por ciento");
@@ -340,64 +428,238 @@ function applyMusicVolume(){
       if(value>0)yt.unMute();
       const applied=musicDucked?Math.round(value*0.28):value;
       yt.setVolume(applied);
-      // Apply twice after the current player event loop; mobile browsers can delay API commands.
       requestAnimationFrame(()=>{try{if(ytReady&&yt)yt.setVolume(musicDucked?Math.round(value*0.28):value)}catch(e){}});
     }catch(e){console.warn("No se pudo ajustar el volumen",e)}
   }
 }
+
 $("volume").addEventListener("input",applyMusicVolume);
 $("volume").addEventListener("change",applyMusicVolume);
 $("enableAudioBtn").addEventListener("click",activateAudio);
-$("stopVoiceBtn").addEventListener("click",()=>{speechQueue.length=0;speechBusy=false;if("speechSynthesis" in window)speechSynthesis.cancel();restoreMusicAfterSpeech();});
+
+// Detener la voz sin dejar IDs bloqueados en la cola.
+$("stopVoiceBtn").addEventListener("click",()=>{
+  for(const item of speechQueue){
+    if(item.__messageId)queuedMessageIds.delete(item.__messageId);
+  }
+  speechQueue.length=0;
+
+  if(activeMessageId){
+    rememberSpokenId(activeMessageId);
+    queuedMessageIds.delete(activeMessageId);
+  }
+
+  activeMessageId=null;
+  speechBusy=false;
+
+  if("speechSynthesis"in window)speechSynthesis.cancel();
+  restoreMusicAfterSpeech();
+});
+
 $("clearQueue").addEventListener("click",async()=>{
   const button=$("clearQueue");button.disabled=true;button.textContent="Borrando…";
   try{
     await remove(ref(db,`rooms/${room}/queue`));
     await remove(ref(db,`rooms/${room}/nowPlaying`));
     queueItems=[];playedIds.clear();currentId="";pendingVideo="";
-    if(ytReady&&yt){try{yt.stopVideo();}catch(e){}}
-    $("nowPlaying").replaceChildren();const a=document.createElement("strong");a.textContent="Nada reproduciéndose";const b=document.createElement("small");b.textContent="La lista musical está vacía.";$("nowPlaying").append(a,b);
-    $("queue").replaceChildren();const empty=document.createElement("div");empty.className="item";empty.textContent="No hay canciones pendientes.";$("queue").append(empty);
-    $("playBtn").disabled=true;$("nextBtn").disabled=true;$("playerNote").textContent="Lista musical borrada.";status("Lista musical borrada","ok");
-  }catch(e){console.error(e);status("No se pudo borrar la lista. Revisa permisos de Firebase.","err");$("playerNote").textContent="Error al borrar: revisa las reglas de Firebase."}
-  finally{button.disabled=false;button.textContent="Borrar lista musical"}
+    if(ytReady&&yt){try{yt.stopVideo()}catch(e){}}
+    $("nowPlaying").replaceChildren();
+    const a=document.createElement("strong");a.textContent="Nada reproduciéndose";
+    const b=document.createElement("small");b.textContent="La lista musical está vacía.";
+    $("nowPlaying").append(a,b);
+    $("queue").replaceChildren();
+    const empty=document.createElement("div");empty.className="item";empty.textContent="No hay canciones pendientes.";
+    $("queue").append(empty);
+    $("playBtn").disabled=true;$("nextBtn").disabled=true;
+    $("playerNote").textContent="Lista musical borrada.";
+    status("Lista musical borrada","ok");
+  }catch(e){
+    console.error(e);status("No se pudo borrar la lista. Revisa permisos de Firebase.","err");
+    $("playerNote").textContent="Error al borrar: revisa las reglas de Firebase.";
+  }finally{button.disabled=false;button.textContent="Borrar lista musical"}
 });
+
 function clearListeners(){unsubs.forEach(fn=>fn());unsubs=[]}
-function attach(){clearListeners();unsubs.push(onValue(ref(db,`rooms/${room}/pc/status`),snap=>{const s=snap.val();if(s?.online&&Date.now()-(s.lastSeen||0)<60000)status("Conectada · Valentina está en línea","ok");else status("Conectada · esperando a Valentina…")},()=>status("Error de permisos de Firebase","err")));unsubs.push(onValue(query(ref(db,`rooms/${room}/queue`),limitToLast(30)),snap=>{
-  renderQueue(snap.val());
-  resolveQueueRequests(snap.val());
-  // Strict FIFO: never play a later resolved request while the oldest request is still resolving.
-  // Solo iniciar una petición automáticamente cuando el reproductor esté libre.
-  // Si ya hay una canción cargada/reproduciéndose, una petición nueva se queda en cola.
-  const first=queueItems.find(x=>!playedIds.has(x._id));
-  if(first && first.videoId && (!currentId || (currentId===first._id && !pendingVideo))){
-    const canAuto=audioUnlocked&&$("autoPlay").checked&&ytReady&&yt;
-    loadTrack(first,!!canAuto);
-    if(canAuto)$("playerNote").textContent="Iniciando la primera canción automáticamente. Las nuevas peticiones esperan su turno.";
-  }
-},()=>status("Error leyendo la cola · revisa permisos de Firebase","err")));unsubs.push(onValue(ref(db,`rooms/${room}/control/skip`),snap=>handleRemoteSkip(snap.val()),()=>{}));let messagesSnapshotPrimed=false;
-unsubs.push(onValue(query(ref(db,`rooms/${room}/messages`),limitToLast(35)),snap=>{
-  const data=snap.val();
-  renderList("messages",data,"Esperando mensajes del LIVE…");
-  const entries=data&&typeof data==="object"?Object.entries(data).sort((a,b)=>(a[1]?.createdAt||0)-(b[1]?.createdAt||0)):[];
-  window.__spokenIds=window.__spokenIds||new Set();
-  // Prime from the initial snapshot: stored messages are backlog, not new chat.
-  if(!messagesSnapshotPrimed){
-    for(const [id] of entries)window.__spokenIds.add(id);
-    messagesSnapshotPrimed=true;
-    return;
-  }
-  for(const [id,item] of entries){
-    if(!window.__spokenIds.has(id)){
-      window.__spokenIds.add(id);
-      if(item&&shouldReadMessage(item))speak(item);
+
+function attach(){
+  clearListeners();
+
+  unsubs.push(onValue(ref(db,`rooms/${room}/pc/status`),snap=>{
+    const s=snap.val();
+    if(s?.online&&Date.now()-(s.lastSeen||0)<60000)status("Conectada · Valentina está en línea","ok");
+    else status("Conectada · esperando a Valentina…");
+  },()=>status("Error de permisos de Firebase","err")));
+
+  unsubs.push(onValue(query(ref(db,`rooms/${room}/queue`),limitToLast(30)),snap=>{
+    renderQueue(snap.val());
+    resolveQueueRequests(snap.val());
+
+    const first=queueItems.find(x=>!playedIds.has(x._id));
+    if(first&&first.videoId&&(!currentId||(currentId===first._id&&!pendingVideo))){
+      const canAuto=audioUnlocked&&$("autoPlay").checked&&ytReady&&yt;
+      loadTrack(first,!!canAuto);
+      if(canAuto)$("playerNote").textContent="Iniciando la primera canción automáticamente. Las nuevas peticiones esperan su turno.";
     }
-  }
-},()=>status("Error leyendo mensajes · revisa permisos de Firebase","err")));let giftsSnapshotPrimed=false;unsubs.push(onValue(query(ref(db,`rooms/${room}/gifts`),limitToLast(10)),snap=>{const data=snap.val();const entries=data&&typeof data==="object"?Object.entries(data).sort((a,b)=>(a[1]?.createdAt||0)-(b[1]?.createdAt||0)):[];window.__shownGiftIds=window.__shownGiftIds||new Set();if(!giftsSnapshotPrimed){giftsSnapshotPrimed=true;for(const [id] of entries)window.__shownGiftIds.add(id);return;}for(const [id,item] of entries){if(window.__shownGiftIds.has(id))continue;window.__shownGiftIds.add(id);if(item)window.SueWidget?.triggerGift({name:item.giftName||item.name||item.gift||"",username:item.username||item.user||"Alguien",imageUrl:item.imageUrl||item.giftImageUrl||""});}},e=>console.warn('Error leyendo regalos de Firebase',e)));unsubs.push(onValue(ref(db,`rooms/${room}/nowPlaying`),snap=>{const item=snap.val();if(item?.videoId&&item.videoId!==pendingVideo)loadTrack(item,$("autoPlay").checked)},()=>{}))}
-$("connectBtn").addEventListener("click",async()=>{$("connectBtn").disabled=true;status("Conectando…");try{if(!auth.currentUser)await signInAnonymously(auth);connected=true;await remove(ref(db,`rooms/${room}/queue`));await remove(ref(db,`rooms/${room}/nowPlaying`));queueItems=[];playedIds.clear();currentId="";pendingVideo="";lastSkipAt=0;skipListenerPrimed=false;if(ytReady&&yt){try{yt.stopVideo();yt.cueVideoById("")}catch(e){}}const a=document.createElement("strong");a.textContent="Nada reproduciéndose";const b=document.createElement("small");b.textContent="Esperando una canción nueva.";$("nowPlaying").replaceChildren(a,b);$("queue").replaceChildren();const empty=document.createElement("div");empty.className="item";empty.textContent="No hay canciones pendientes.";$("queue").append(empty);$("playBtn").disabled=true;$("nextBtn").disabled=true;$("connectBtn").textContent="✓ Conectada";$("helpText").textContent="Conectada. La cola empieza vacía y solo se añadirán canciones nuevas desde ahora.";attach()}catch(e){console.error(e);status("No se pudo conectar. Revisa Authentication y las reglas de Firebase.","err");$("helpText").textContent="Firebase rechazó el acceso. No abras reglas al público; comprueba el inicio anónimo y las reglas autenticadas.";$("connectBtn").textContent="Reintentar conexión"}finally{$("connectBtn").disabled=false}});
+  },()=>status("Error leyendo la cola · revisa permisos de Firebase","err")));
+
+  unsubs.push(onValue(ref(db,`rooms/${room}/control/skip`),snap=>handleRemoteSkip(snap.val()),()=>{}));
+
+  let messagesSnapshotPrimed=false;
+
+  unsubs.push(onValue(query(ref(db,`rooms/${room}/messages`),limitToLast(35)),snap=>{
+    const data=snap.val();
+    renderList("messages",data,"Esperando mensajes del LIVE…");
+
+    const entries=data&&typeof data==="object"
+      ?Object.entries(data).sort((a,b)=>{
+          const timeA=Number(a[1]?.createdAt)||0;
+          const timeB=Number(b[1]?.createdAt)||0;
+          return timeA-timeB||a[0].localeCompare(b[0]);
+        })
+      :[];
+
+    // El primer snapshot es el historial antiguo: se registra pero no se lee.
+    if(!messagesSnapshotPrimed){
+      messagesSnapshotPrimed=true;
+
+      for(const [id,item] of entries){
+        rememberSpokenId(id);
+
+        const cursor={time:Number(item?.createdAt)||0,id};
+
+        if(!lastMessageCursor||
+          cursor.time>lastMessageCursor.time||
+          (cursor.time===lastMessageCursor.time&&cursor.id>lastMessageCursor.id)){
+          lastMessageCursor=cursor;
+        }
+      }
+      return;
+    }
+
+    for(const [id,item] of entries){
+      const messageTime=Number(item?.createdAt)||0;
+
+      if(lastMessageCursor){
+        const older=
+          messageTime<lastMessageCursor.time||
+          (messageTime===lastMessageCursor.time&&id<=lastMessageCursor.id);
+
+        if(older)continue;
+      }
+
+      lastMessageCursor={time:messageTime,id};
+
+      if(recentSpokenSet.has(id)||queuedMessageIds.has(id))continue;
+
+      if(item&&shouldReadMessage(item)){
+        speak(item,id);
+      }else{
+        rememberSpokenId(id);
+      }
+    }
+  },()=>status("Error leyendo mensajes · revisa permisos de Firebase","err")));
+
+  let giftsSnapshotPrimed=false;
+
+  unsubs.push(onValue(query(ref(db,`rooms/${room}/gifts`),limitToLast(10)),snap=>{
+    const data=snap.val();
+    const entries=data&&typeof data==="object"?Object.entries(data).sort((a,b)=>(a[1]?.createdAt||0)-(b[1]?.createdAt||0)):[];
+    window.__shownGiftIds=window.__shownGiftIds||new Set();
+
+    if(!giftsSnapshotPrimed){
+      giftsSnapshotPrimed=true;
+      for(const [id] of entries)window.__shownGiftIds.add(id);
+      return;
+    }
+
+    for(const [id,item] of entries){
+      if(window.__shownGiftIds.has(id))continue;
+      window.__shownGiftIds.add(id);
+      if(item)window.SueWidget?.triggerGift({
+        name:item.giftName||item.name||item.gift||"",
+        username:item.username||item.user||"Alguien",
+        imageUrl:item.imageUrl||item.giftImageUrl||""
+      });
+    }
+  },e=>console.warn('Error leyendo regalos de Firebase',e)));
+
+  unsubs.push(onValue(ref(db,`rooms/${room}/nowPlaying`),snap=>{
+    const item=snap.val();
+    if(item?.videoId&&item.videoId!==pendingVideo)loadTrack(item,$("autoPlay").checked);
+  },()=>{}));
+}
+
+$("connectBtn").addEventListener("click",async()=>{
+  $("connectBtn").disabled=true;
+  status("Conectando…");
+
+  try{
+    if(!auth.currentUser)await signInAnonymously(auth);
+    connected=true;
+
+    await remove(ref(db,`rooms/${room}/queue`));
+    await remove(ref(db,`rooms/${room}/nowPlaying`));
+
+    queueItems=[];playedIds.clear();currentId="";pendingVideo="";
+    lastSkipAt=0;skipListenerPrimed=false;
+
+    if(ytReady&&yt){try{yt.stopVideo();yt.cueVideoById("")}catch(e){}}
+
+    const a=document.createElement("strong");a.textContent="Nada reproduciéndose";
+    const b=document.createElement("small");b.textContent="Esperando una canción nueva.";
+    $("nowPlaying").replaceChildren(a,b);
+    $("queue").replaceChildren();
+
+    const empty=document.createElement("div");empty.className="item";empty.textContent="No hay canciones pendientes.";
+    $("queue").append(empty);
+
+    $("playBtn").disabled=true;$("nextBtn").disabled=true;
+    $("connectBtn").textContent="✓ Conectada";
+    $("helpText").textContent="Conectada. La cola empieza vacía y solo se añadirán canciones nuevas desde ahora.";
+
+    attach();
+  }catch(e){
+    console.error(e);
+    status("No se pudo conectar. Revisa Authentication y las reglas de Firebase.","err");
+    $("helpText").textContent="Firebase rechazó el acceso. No abras reglas al público; comprueba el inicio anónimo y las reglas autenticadas.";
+    $("connectBtn").textContent="Reintentar conexión";
+  }finally{$("connectBtn").disabled=false}
+});
+
 onAuthStateChanged(auth,user=>{if(user&&connected)attach()});
-$("clearMessages").addEventListener("click",()=>{$("messages").replaceChildren();const e=document.createElement("div");e.className="item";e.textContent="Mensajes ocultos en esta pantalla; no se borraron de Firebase."; $("messages").append(e)});
-function fillVoices(){const select=$("voiceSelect"),old=select.value;select.replaceChildren();const voices=speechSynthesis?.getVoices?.()||[];voices.filter(v=>/^es(-|_)/i.test(v.lang)).forEach(v=>{const o=document.createElement("option");o.value=v.name;o.textContent=`${v.name} (${v.lang})`;select.append(o)});if(old)select.value=old}
+
+$("clearMessages").addEventListener("click",()=>{
+  $("messages").replaceChildren();
+  const e=document.createElement("div");e.className="item";
+  e.textContent="Mensajes ocultos en esta pantalla; no se borraron de Firebase.";
+  $("messages").append(e);
+});
+
+function fillVoices(){
+  const select=$("voiceSelect"),old=select.value;
+  select.replaceChildren();
+  const voices=speechSynthesis?.getVoices?.()||[];
+  voices.filter(v=>/^es(-|_)/i.test(v.lang)).forEach(v=>{
+    const o=document.createElement("option");
+    o.value=v.name;o.textContent=`${v.name} (${v.lang})`;
+    select.append(o);
+  });
+  if(old)select.value=old;
+}
+
 if("speechSynthesis"in window){fillVoices();speechSynthesis.onvoiceschanged=fillVoices}
-$("testVoice").addEventListener("click",()=>{if(!("speechSynthesis"in window))return;const u=new SpeechSynthesisUtterance("Hola, soy Valentina. Ya puedo leer los comentarios del directo.");u.lang="es-ES";u.rate=Number($("speed").value)||1;u.volume=Number($("speechVolume").value)||1;const v=speechSynthesis.getVoices().find(x=>x.name===$("voiceSelect").value);if(v)u.voice=v;speechSynthesis.cancel();speechSynthesis.speak(u)});
-</script></body></html>
+
+$("testVoice").addEventListener("click",()=>{
+  if(!("speechSynthesis"in window))return;
+  const u=new SpeechSynthesisUtterance("Hola, soy Valentina. Ya puedo leer los comentarios del directo.");
+  u.lang="es-ES";
+  u.rate=Number($("speed").value)||1;
+  u.volume=Number($("speechVolume").value)||1;
+  const v=speechSynthesis.getVoices().find(x=>x.name===$("voiceSelect").value);
+  if(v)u.voice=v;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+});
+</script>
+</body>
+</html>
